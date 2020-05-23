@@ -7,6 +7,9 @@ namespace TensorEnumeration
 {
 /**
  * \brief Compute the binomial coefficient n over k.
+ *
+ * This function is constexpr, such that it can be eliminated
+ * completely if #n and #k are known at compile time.
  */
 constexpr unsigned int binomial(unsigned int n, unsigned int k)
 {
@@ -27,10 +30,13 @@ constexpr unsigned int binomial(unsigned int n, unsigned int k)
 /**
  * An object representing a selection of $k$ numbers out of the
  * set $\{0,1,\ldots,n-1$.
+ *
+ * The data is always normalized to highest index first.
  */
 template <int n, int k>
 class Combination
 {
+  /// The numbers in the combination
   unsigned int data[k];
 
 public:
@@ -57,7 +63,12 @@ public:
 
 
 /**
- * The combinations of `k` elements out of `n`.
+ * The combinations of `k` elements out of `n` as a container.
+ *
+ * This class template does not contain any data, but it implements an
+ * enumeration of combinations, such that any combination as an array
+ * of `k` numbers from `0` to `n-1` can be obtained from its index and
+ * vice versa.
  */
 template <int n, int k>
 struct Combinations
@@ -67,7 +78,19 @@ struct Combinations
    */
   static constexpr unsigned int size();
 
+  /**
+   * \brief The array of numbers (of length `k`) in the combination
+   * with given index.
+   */
   static std::array<unsigned int, k> value(unsigned int index);
+  /**
+   * \brief The array of numbers (of length `n-k`) of numbers not in
+   * the combination of the given index.
+   *
+   * \todo This is currently implemented by computing value() and then
+   * building the complement. It it is to be used often, the
+   * implementation should be more efficient.
+   */
   static std::array<unsigned int, n - k> dual(unsigned int index);
 
   /**
@@ -76,6 +99,10 @@ struct Combinations
   static unsigned int index(const std::array<unsigned int, k>& combi);
 
   private:
+  /**
+   * \brief The function template computing the combination in
+   * lexicographic ordering recursively.
+   */
   template <unsigned int size, typename... I>
   static constexpr std::array<unsigned int,k> compute_recursive(unsigned int index, I ...args);
 };
