@@ -28,6 +28,14 @@ std::ostream& operator<<(std::ostream& os, std::array<T, N> a)
   return os;
 }
 
+template <std::size_t N>
+std::ostream& operator<<(std::ostream& os, std::array<bool, N> a)
+{
+  for (std::size_t j = 0; j < a.size(); ++j)
+    os << (a[j] ? 't' : 'f');
+  return os;
+}
+
 template <int n, int k>
 struct print_combination
 {
@@ -37,7 +45,22 @@ struct print_combination
       {
 	auto a = TE::Combinations<n, k>::value(i);
 	auto b = TE::Combinations<n, k>::dual(i);
-	std::cout << i << ' ' << TE::Combinations<n, k>::index(a) << ":\t" << a << " |" << b << std::endl;
+	std::array<bool,n> boolvalue;
+	std::array<bool,n> booldual;
+	for (unsigned int j=0;j<k;++j)
+	  {
+	    boolvalue[a[j]] = true;
+	    booldual[a[j]] = false;
+	  }
+	for (unsigned int j=0;j<n-k;++j)
+	  {
+	    boolvalue[b[j]] = false;
+	    booldual[b[j]] = true;
+	  }
+	std::cout << i << ' ' << TE::Combinations<n, k>::index(a)
+	    << ":\t" << a << " |" << b
+	    << " bools: " << boolvalue << ' ' << booldual
+	    << std::endl;
 	if (TE::Combinations<n, k>::index(a) != i)
 	  throw i;
       }
