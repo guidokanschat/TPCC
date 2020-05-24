@@ -75,7 +75,7 @@ struct Combinations
    * lexicographic ordering recursively.
    */
   template <unsigned int size, typename... I>
-  static constexpr std::array<unsigned int,k> compute_recursive(unsigned int index, I ...args);
+  static constexpr std::array<unsigned int,k> compute_value(unsigned int index, I ...args);
 };
 
 template <int n, int k>
@@ -87,7 +87,7 @@ constexpr unsigned int Combinations<n, k>::size()
 template <int n, int k>
 template <unsigned int sz, typename... I>
 constexpr std::array<unsigned int,k>
-Combinations<n, k>::compute_recursive(unsigned int index, I ...args)
+Combinations<n, k>::compute_value(unsigned int index, I ...args)
 {
   if (index > size())
     abort();
@@ -105,7 +105,7 @@ Combinations<n, k>::compute_recursive(unsigned int index, I ...args)
         bn = bi;
       }
     --cs;
-    return compute_recursive<sz-1>(index-bn, args..., cs);
+    return compute_value<sz-1>(index-bn, args..., cs);
   }
 }
 
@@ -129,7 +129,7 @@ std::array<unsigned int, k> Combinations<n, k>::value(unsigned int index)
   if constexpr (k==0)
       return std::array<unsigned int,0>();
   else
-    return compute_recursive<k>(index);
+    return compute_value<k>(index);
 }
 
 template <int n, int k>
