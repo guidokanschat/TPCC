@@ -47,7 +47,7 @@ struct Combinations
   /**
    * \brief A boolean array of length `n` with a `true` for each selected value
    */
-  static constexpr std::array<bool,n> operator[] (unsigned int);
+   constexpr std::array<bool,n> operator[] (unsigned int);
   
   /**
    * \brief The array of numbers (of length `k`) in the combination
