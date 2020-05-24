@@ -5,28 +5,21 @@
 
 namespace TE = TensorEnumeration;
 
-namespace Testing
-{
-  unsigned int pascal_data[11][11] =
-    {
-     {   1,  10,  45, 120, 210, 252, 210, 120,  45,  10,   1},
-     {   1,   9,  36,  84, 126, 126,  84,  36,   9,   1,   0},
-     {   1,   8,  28,  56,  70,  56,  28,   8,   1,   0,   0},
-     {   1,   7,  21,  35,  35,  21,   7,   1,   0,   0,   0},
-     {   1,   6,  15,  20,  15,   6,   1,   0,   0,   0,   0},
-     {   1,   5,  10,  10,   5,   1,   0,   0,   0,   0,   0},
-     {   1,   4,   6,   4,   1,   0,   0,   0,   0,   0,   0},
-     {   1,   3,   3,   1,   0,   0,   0,   0,   0,   0,   0},
-     {   1,   2,   1,   0,   0,   0,   0,   0,   0,   0,   0},
-     {   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0},
-     {   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}
-    };
-/**
- * \brief Compute binomail coefficients and combinations in
- * lexicographical order
- */
-namespace binomial
-{
+unsigned int pascal_data[11][11] =
+  {
+   {   1,  10,  45, 120, 210, 252, 210, 120,  45,  10,   1},
+   {   1,   9,  36,  84, 126, 126,  84,  36,   9,   1,   0},
+   {   1,   8,  28,  56,  70,  56,  28,   8,   1,   0,   0},
+   {   1,   7,  21,  35,  35,  21,   7,   1,   0,   0,   0},
+   {   1,   6,  15,  20,  15,   6,   1,   0,   0,   0,   0},
+   {   1,   5,  10,  10,   5,   1,   0,   0,   0,   0,   0},
+   {   1,   4,   6,   4,   1,   0,   0,   0,   0,   0,   0},
+   {   1,   3,   3,   1,   0,   0,   0,   0,   0,   0,   0},
+   {   1,   2,   1,   0,   0,   0,   0,   0,   0,   0,   0},
+   {   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0},
+   {   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}
+  };
+
 template <typename T, std::size_t N>
 std::ostream& operator<<(std::ostream& os, std::array<T, N> a)
 {
@@ -60,7 +53,7 @@ void pascal(unsigned int padding=n)
     throw y;
   char xc[x];
   char yc[y];
-
+  
   if (k==n)
     std::cout << '{';
   else
@@ -71,18 +64,15 @@ void pascal(unsigned int padding=n)
   if constexpr (k > 0)
     pascal<n, k-1>(padding);
   else
-  {
-    for (unsigned int i=n;i<padding;++i)
-      std::cout << ',' << std::setw(4) << 0;
-    std::cout << "}," << std::endl;
-    if constexpr (n > 0)
-      pascal<n-1,n-1>(padding);
-  }
-}
-}
+    {
+      for (unsigned int i=n;i<padding;++i)
+	std::cout << ',' << std::setw(4) << 0;
+      std::cout << "}," << std::endl;
+      if constexpr (n > 0)
+	pascal<n-1,n-1>(padding);
+    }
 }
 
-using namespace Testing::binomial;
 
 int main()
 {

@@ -11,7 +11,8 @@ namespace TensorEnumeration
  * This function is constexpr, such that it can be eliminated
  * completely if #n and #k are known at compile time.
  */
-constexpr unsigned int binomial(unsigned int n, unsigned int k)
+  template <typename T=unsigned int>
+constexpr T binomial(T n, T k)
 {
   if (n < k)
     return 0;
@@ -26,41 +27,6 @@ constexpr unsigned int binomial(unsigned int n, unsigned int k)
 
   return result;
 }
-
-/**
- * An object representing a selection of $k$ numbers out of the
- * set $\{0,1,\ldots,n-1$.
- *
- * The data is always normalized to highest index first.
- */
-template <int n, int k>
-class Combination
-{
-  /// The numbers in the combination
-  unsigned int data[k];
-
-public:
-  constexpr Combination(unsigned int i)
-    : data()
-  {
-  }
-
-  Combination(const std::array<unsigned int, k>& input)
-  {
-    std::copy(std::begin(input), std::end(input), &data[0]);
-  }
-
-  unsigned int index() const
-  {
-    unsigned int result = 0;
-    int j = 0;
-    for (int i = 0; i < k; ++i)
-      while (++j <= data[i])
-        result += binomial(n - 1 - j, k - 1 - i);
-    return result;
-  }
-};
-
 
 /**
  * The combinations of `k` elements out of `n` as a container.
@@ -78,6 +44,11 @@ struct Combinations
    */
   static constexpr unsigned int size();
 
+  /**
+   * \brief A boolean array of length `n` with a `true` for each selected value
+   */
+  static constexpr std::array<bool,n> operator[] (unsigned int);
+  
   /**
    * \brief The array of numbers (of length `k`) in the combination
    * with given index.
