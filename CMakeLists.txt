@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 enable_testing()
 
-project(TensorEnumeration LANGUAGES CXX)
+project(TCPP LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,4 +9,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(include)
 
 add_subdirectory(tests)
+add_subdirectory(doc)
+
 add_executable(TensorEnumeration main.cpp)
