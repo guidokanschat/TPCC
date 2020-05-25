@@ -30,15 +30,15 @@ namespace TensorEnumeration
     constexpr Lexicographic(const std::array<Sint, n>& d)
       : dimensions(d)
     {
+      Combinations<n,k> combinations;
       for (Tint i=0;i<binomial(n,k);++i)
 	{
 	  Bint p = 1;
-	  auto combination = Combinations<n, k>::value(i);
-	  auto complement = Combinations<n, k>::dual(i);
+	  auto combination = combinations[i];
 	  for (Tint j=0;j<k;++j)
-	    p *= dimensions[combination[j]];
+	    p *= dimensions[combination.in(j)];
 	  for (Tint j=0;j<n-k;++j)
-	    p *= 1 + dimensions[complement[j]];
+	    p *= 1 + dimensions[combination.out(j)];
 	  block_sizes[i] = p;
 	}
     }

@@ -29,6 +29,29 @@ constexpr T binomial(T n, T k)
 }
 
 /**
+ * \brief Dataset for a combination k out of n
+ */
+  template <int n, int k, typename T=unsigned int>
+class Combination
+{
+  std::array<T, k> combination;
+  std::array<T,n-k> complement;
+public:
+  Combination(const std::array<T, k>& combi,
+	      const std::array<T,n-k>& comp)
+    : combination(combi), complement(comp)
+  {}
+  T in(unsigned int i) const
+  {
+    return combination[i];
+  }
+  T out(unsigned int i) const
+  {
+    return complement[i];
+  }
+  };
+
+/**
  * The combinations of `k` elements out of `n` as a container.
  *
  * This class template does not contain any data, but it implements an
@@ -47,7 +70,7 @@ struct Combinations
   /**
    * \brief A boolean array of length `n` with a `true` for each selected value
    */
-   constexpr std::array<bool,n> operator[] (unsigned int);
+  constexpr Combination<n,k> operator[] (unsigned int);
   
   /**
    * \brief The array of numbers (of length `k`) in the combination
@@ -152,6 +175,12 @@ std::array<unsigned int, n - k> Combinations<n, k>::dual(unsigned int index)
       result[i] = current;
     }
   return result;
+}
+
+template <int n, int k>
+constexpr Combination<n,k> Combinations<n, k>::operator[] (unsigned int index)
+{
+  return Combination<n,k>(value(index), dual(index));
 }
 }
 
