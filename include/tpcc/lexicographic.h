@@ -6,7 +6,7 @@
 namespace TPCC
 {
   /**
-   * \brief The `k`-dimensional faces in a tensor product grid of dimension `n`.
+   * \brief The `k`-dimensional faces in a tensor product chain complex of dimension `n`.
    *
    * \tparam n: The dimension of the tensor product (the order of the tensor)
    * \tparam k: The dimensions of the object considered

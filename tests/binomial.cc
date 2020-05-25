@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <stdexcept>
 
 #include <tpcc/combinations.h>
 
@@ -16,6 +17,66 @@ unsigned int pascal_data[11][11] =
    {   1,   2,   1,   0,   0,   0,   0,   0,   0,   0,   0},
    {   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0},
    {   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}
+  };
+
+const char* combination_data_0[] = {"fffff"};
+
+const char* combination_data_1[] =
+  {
+   "tffff",
+   "ftfff",
+   "fftff",
+   "ffftf",
+   "fffft"
+  };
+
+const char* combination_data_2[] =
+  {
+   "ttfff",
+   "tftff",
+   "fttff",
+   "tfftf",
+   "ftftf",
+   "ffttf",
+   "tffft",
+   "ftfft",
+   "fftft",
+   "ffftt"
+  };
+
+const char* combination_data_3[] =
+  {
+   "tttff",
+   "ttftf",
+   "tfttf",
+   "ftttf",
+   "ttfft",
+   "tftft",
+   "fttft",
+   "tfftt",
+   "ftftt",
+   "ffttt"
+  };
+
+const char* combination_data_4[] =
+  {
+   "ttttf",
+   "tttft",
+   "ttftt",
+   "tfttt",
+   "ftttt"
+  };
+
+const char* combination_data_5[] = { "ttttt" };
+
+const char** combination_data[] =
+  {
+   combination_data_0,
+   combination_data_1,
+   combination_data_2,
+   combination_data_3,
+   combination_data_4,
+   combination_data_5
   };
 
 template <typename T, std::size_t N>
@@ -46,25 +107,29 @@ struct print_combination
 	auto b = combinations.dual(i);
 	auto combi = combinations[i];
 	std::array<bool,n> boolvalue;
-	std::array<bool,n> booldual;
 	for (unsigned int j=0;j<k;++j)
 	  {
+	    if (a[j] != combi.in(j))
+	      throw std::logic_error{"value() and operator[] inconsistent"};
+	    if (combination_data[k][i][combi.in(j)] != 't')
+	      throw std::logic_error{"Combination does not match stored data"};
 	    boolvalue[a[j]] = true;
-	    booldual[a[j]] = false;
 	  }
 	for (unsigned int j=0;j<n-k;++j)
 	  {
+	    if (b[j] != combi.out(j))
+	      throw std::logic_error{"dual() and operator[] inconsistent"};
+	    if (combination_data[k][i][combi.out(j)] != 'f')
+	      throw std::logic_error{"Combination does not match stored data"};
 	    boolvalue[b[j]] = false;
-	    booldual[b[j]] = true;
 	  }
-	std::cout << i << ' ' << combinations.index(combi)
-		  << ":\t";
+	std::cout << i << ":\t";
 	combi.print_debug(std::cout);
-	std::cout << ' ' << a << " |" << b
-	    << " bools: " << boolvalue << ' ' << booldual
+	std::cout
+	    << " bools: \"" << boolvalue << "\""
 	    << std::endl;
 	if (combinations.index(combi) != i)
-	  throw i;
+	  throw std::logic_error{"Error in index computation"};
       }
   }
 };
@@ -75,7 +140,7 @@ void pascal(unsigned int padding=n)
   const unsigned int x = TPCC::Combinations<n, k>::size();
   const unsigned int y = TPCC::binomial(n, k);
   if (x != y)
-    throw y;
+    throw std::domain_error{"Size of combination wrong"};
   char xc[x];
   char yc[y];
   
@@ -85,7 +150,7 @@ void pascal(unsigned int padding=n)
     std::cout << ',';
   std::cout << std::setw(4) << x;
   if (x != pascal_data[10-n][k])
-    throw (n);
+    throw std::logic_error{"Value in Pascal's triangle wrong"};
   if constexpr (k > 0)
     pascal<n, k-1>(padding);
   else
