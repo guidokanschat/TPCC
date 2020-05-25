@@ -43,8 +43,10 @@ struct print_combination
   {
     for (unsigned int i=0;i<TE::Combinations<n, k>::size();++i)
       {
-	auto a = TE::Combinations<n, k>::value(i);
-	auto b = TE::Combinations<n, k>::dual(i);
+	TE::Combinations<n, k> combinations;
+	auto a = combinations.value(i);
+	auto b = combinations.dual(i);
+	auto combi = combinations[i];
 	std::array<bool,n> boolvalue;
 	std::array<bool,n> booldual;
 	for (unsigned int j=0;j<k;++j)
@@ -57,11 +59,13 @@ struct print_combination
 	    boolvalue[b[j]] = false;
 	    booldual[b[j]] = true;
 	  }
-	std::cout << i << ' ' << TE::Combinations<n, k>::index(a)
-	    << ":\t" << a << " |" << b
+	std::cout << i << ' ' << combinations.index(combi)
+		  << ":\t";
+	combi.print_debug(std::cout);
+	std::cout << ' ' << a << " |" << b
 	    << " bools: " << boolvalue << ' ' << booldual
 	    << std::endl;
-	if (TE::Combinations<n, k>::index(a) != i)
+	if (combinations.index(combi) != i)
 	  throw i;
       }
   }
@@ -103,10 +107,12 @@ int main()
   //  std::cout << a << std::endl;
   std::cout << "Pascal" << std::endl;
   pascal<10>();
+  print_combination<5, 0>::doit();
   print_combination<5, 1>::doit();
   print_combination<5, 2>::doit();
   print_combination<5, 3>::doit();
   print_combination<5, 4>::doit();
+  print_combination<5, 5>::doit();
   std::cout << std::endl;
   //  print_combination<6, 4, Combinations<6, 4>::size() - 1>::doit();
 }

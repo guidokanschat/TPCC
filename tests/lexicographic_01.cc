@@ -5,8 +5,8 @@
 
 namespace TE = TensorEnumeration;
 
-constexpr std::array<unsigned short, 2> dim2 {{ 3,4 }};
-constexpr std::array<unsigned short, 3> dim3 {{ 3,4,5 }};
+constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
+constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
 
 template <int k>
 void test_2()
