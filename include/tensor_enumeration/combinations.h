@@ -135,6 +135,8 @@ std::array<unsigned int, k> Combinations<n, k>::value(unsigned int index)
 template <int n, int k>
 std::array<unsigned int, n - k> Combinations<n, k>::dual(unsigned int index)
 {
+  if constexpr (k==0)
+    return Combinations<n,n>::value(index);
   auto v = value(index);
   std::array<unsigned int, n - k> result;
   unsigned int vpos = 0;
