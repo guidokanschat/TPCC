@@ -1,9 +1,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <tensor_enumeration/lexicographic.h>
-
-namespace TE = TensorEnumeration;
+#include <tpcc/lexicographic.h>
 
 constexpr std::array<unsigned short, 1> dim1 {{ 5 }};
 constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
@@ -11,7 +9,7 @@ constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
 constexpr std::array<unsigned short, 4> dim4 {{ 1,2,3,4 }};
 
 template <int n, int k>
-void print_mesh(const TE::Lexicographic<n,k>& mesh)
+void print_mesh(const TPCC::Lexicographic<n,k>& mesh)
 {
   for (unsigned int i=0;i<mesh.size();++i)
     {
@@ -27,7 +25,7 @@ void print_mesh(const TE::Lexicographic<n,k>& mesh)
 template <int k>
 void test_1()
 {
-  TE::Lexicographic<1,k> mesh = dim1;
+  TPCC::Lexicographic<1,k> mesh = dim1;
   std::cout << "Mesh-Dim: " << 1 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }
@@ -35,7 +33,7 @@ void test_1()
 template <int k>
 void test_2()
 {
-  TE::Lexicographic<2,k> mesh = dim2;
+  TPCC::Lexicographic<2,k> mesh = dim2;
   std::cout << "Mesh-Dim: " << 2 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }
@@ -43,7 +41,7 @@ void test_2()
 template <int k>
 void test_3()
 {
-  TE::Lexicographic<3,k> mesh = dim3;
+  TPCC::Lexicographic<3,k> mesh = dim3;
   std::cout << "Mesh-Dim: " << 3 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }
@@ -51,7 +49,7 @@ void test_3()
 template <int k>
 void test_4()
 {
-  TE::Lexicographic<4,k> mesh = dim4;
+  TPCC::Lexicographic<4,k> mesh = dim4;
   std::cout << "Mesh-Dim: " << 4 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }

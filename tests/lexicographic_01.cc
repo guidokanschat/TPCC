@@ -1,9 +1,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <tensor_enumeration/lexicographic.h>
-
-namespace TE = TensorEnumeration;
+#include <tpcc/lexicographic.h>
 
 constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
 constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
@@ -11,18 +9,18 @@ constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
 template <int k>
 void test_2()
 {
-  TE::Lexicographic<2,k> mesh = dim2;
+  TPCC::Lexicographic<2,k> mesh = dim2;
   std::cout << "Mesh-Dim: " << 2 << " Element-Dim: " << k << std::endl;
-  for (unsigned int i=0;i<TE::binomial(2,k);++i)
+  for (unsigned int i=0;i<TPCC::binomial(2,k);++i)
     std::cout << "Block " << i << ":\t" << mesh.block_size(i) << std::endl;
 }
 
 template <int k>
 void test_3()
 {
-  TE::Lexicographic<3,k> mesh = dim3;
+  TPCC::Lexicographic<3,k> mesh = dim3;
   std::cout << "Mesh-Dim: " << 3 << " Element-Dim: " << k << std::endl;
-  for (unsigned int i=0;i<TE::binomial(3,k);++i)
+  for (unsigned int i=0;i<TPCC::binomial(3,k);++i)
     std::cout << "Block " << i << ":\t" << mesh.block_size(i) << std::endl;
 }
 

@@ -1,9 +1,9 @@
-#ifndef TENSOR_ENUMERATION_LEXICOGRAPHIC_H
-#define TENSOR_ENUMERATION_LEXICOGRAPHIC_H
+#ifndef TPCC_LEXICOGRAPHIC_H
+#define TPCC_LEXICOGRAPHIC_H
 
-#include <tensor_enumeration/combinations.h>
+#include <tpcc/combinations.h>
 
-namespace TensorEnumeration
+namespace TPCC
 {
   /**
    * \brief The `k`-dimensional faces in a tensor product grid of dimension `n`.

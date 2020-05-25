@@ -1,9 +1,9 @@
-#ifndef tensor_enumeration_combination_h
-#define tensor_enumeration_combination_h
+#ifndef TPCC_COMBINATIONS_H
+#define TPCC_COMBINATIONS_H
 
 #include <array>
 
-namespace TensorEnumeration
+namespace TPCC
 {
 /**
  * \brief Compute the binomial coefficient n over k.

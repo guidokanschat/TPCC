@@ -1,9 +1,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <tensor_enumeration/combinations.h>
-
-namespace TE = TensorEnumeration;
+#include <tpcc/combinations.h>
 
 unsigned int pascal_data[11][11] =
   {
@@ -41,9 +39,9 @@ struct print_combination
 {
   static void doit()
   {
-    for (unsigned int i=0;i<TE::Combinations<n, k>::size();++i)
+    for (unsigned int i=0;i<TPCC::Combinations<n, k>::size();++i)
       {
-	TE::Combinations<n, k> combinations;
+	TPCC::Combinations<n, k> combinations;
 	auto a = combinations.value(i);
 	auto b = combinations.dual(i);
 	auto combi = combinations[i];
@@ -74,8 +72,8 @@ struct print_combination
 template <int n, int k = n>
 void pascal(unsigned int padding=n)
 {
-  const unsigned int x = TE::Combinations<n, k>::size();
-  const unsigned int y = TE::binomial(n, k);
+  const unsigned int x = TPCC::Combinations<n, k>::size();
+  const unsigned int y = TPCC::binomial(n, k);
   if (x != y)
     throw y;
   char xc[x];
