@@ -29,7 +29,7 @@ constexpr T binomial(T n, T k)
 }
 
   /**
-   * Given a combination, compute its complement in the set of numbers
+   * Given a combination as an array, compute its complement in the set of numbers
    * from `0` to `n-1`.
    *
    * \todo Make this constexpr
@@ -97,7 +97,29 @@ public:
   /**
    * \brief The combination obtained by eliminating the `i`th element
    */
-  Combination<n,k-1,T> eliminate (unsigned int i) const;
+  constexpr Combination<n,k-1,T> eliminate (unsigned int i) const
+  {
+      std::array<T,k-1> outdata{};
+      for (unsigned int j=0;j<i;++j)
+          outdata[j] = data[j];
+      const T tmp = data[i];
+      for (unsigned int j=i;j<k-1;++j)
+        outdata[j] = data[j+1];
+      std::array<T,n-k+1> outcdata{};
+      unsigned int jj=0,j=0;
+      for (;j<n-k;++j,++jj)
+          {
+            if (jj==j && cdata[j]<tmp)
+                {
+                    outcdata[j] = tmp;
+                    ++jj;
+                }
+            outcdata[jj] = cdata[j];
+          }
+      if (jj==j)
+          outcdata[n-k] = tmp;
+      return Combination<n,k-1>{outdata, outcdata};
+  }
   
   /**
    * \brief Print the content of this object for debugging.
