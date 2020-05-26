@@ -1,9 +1,8 @@
 #include <iostream>
 #include <iomanip>
+#include <stdexcept>
 
-#include <tensor_enumeration/combinations.h>
-
-namespace TE = TensorEnumeration;
+#include <tpcc/combinations.h>
 
 unsigned int pascal_data[11][11] =
   {
@@ -18,6 +17,66 @@ unsigned int pascal_data[11][11] =
    {   1,   2,   1,   0,   0,   0,   0,   0,   0,   0,   0},
    {   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0},
    {   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}
+  };
+
+const char* combination_data_0[] = {"fffff"};
+
+const char* combination_data_1[] =
+  {
+   "tffff",
+   "ftfff",
+   "fftff",
+   "ffftf",
+   "fffft"
+  };
+
+const char* combination_data_2[] =
+  {
+   "ttfff",
+   "tftff",
+   "fttff",
+   "tfftf",
+   "ftftf",
+   "ffttf",
+   "tffft",
+   "ftfft",
+   "fftft",
+   "ffftt"
+  };
+
+const char* combination_data_3[] =
+  {
+   "tttff",
+   "ttftf",
+   "tfttf",
+   "ftttf",
+   "ttfft",
+   "tftft",
+   "fttft",
+   "tfftt",
+   "ftftt",
+   "ffttt"
+  };
+
+const char* combination_data_4[] =
+  {
+   "ttttf",
+   "tttft",
+   "ttftt",
+   "tfttt",
+   "ftttt"
+  };
+
+const char* combination_data_5[] = { "ttttt" };
+
+const char** combination_data[] =
+  {
+   combination_data_0,
+   combination_data_1,
+   combination_data_2,
+   combination_data_3,
+   combination_data_4,
+   combination_data_5
   };
 
 template <typename T, std::size_t N>
@@ -41,28 +100,36 @@ struct print_combination
 {
   static void doit()
   {
-    for (unsigned int i=0;i<TE::Combinations<n, k>::size();++i)
+    for (unsigned int i=0;i<TPCC::Combinations<n, k>::size();++i)
       {
-	auto a = TE::Combinations<n, k>::value(i);
-	auto b = TE::Combinations<n, k>::dual(i);
+	TPCC::Combinations<n, k> combinations;
+	auto a = combinations.value(i);
+	auto b = combinations.dual(i);
+	auto combi = combinations[i];
 	std::array<bool,n> boolvalue;
-	std::array<bool,n> booldual;
 	for (unsigned int j=0;j<k;++j)
 	  {
+	    if (a[j] != combi.in(j))
+	      throw std::logic_error{"value() and operator[] inconsistent"};
+	    if (combination_data[k][i][combi.in(j)] != 't')
+	      throw std::logic_error{"Combination does not match stored data"};
 	    boolvalue[a[j]] = true;
-	    booldual[a[j]] = false;
 	  }
 	for (unsigned int j=0;j<n-k;++j)
 	  {
+	    if (b[j] != combi.out(j))
+	      throw std::logic_error{"dual() and operator[] inconsistent"};
+	    if (combination_data[k][i][combi.out(j)] != 'f')
+	      throw std::logic_error{"Combination does not match stored data"};
 	    boolvalue[b[j]] = false;
-	    booldual[b[j]] = true;
 	  }
-	std::cout << i << ' ' << TE::Combinations<n, k>::index(a)
-	    << ":\t" << a << " |" << b
-	    << " bools: " << boolvalue << ' ' << booldual
+	std::cout << i << ":\t";
+	combi.print_debug(std::cout);
+	std::cout
+	    << " bools: \"" << boolvalue << "\""
 	    << std::endl;
-	if (TE::Combinations<n, k>::index(a) != i)
-	  throw i;
+	if (combinations.index(combi) != i)
+	  throw std::logic_error{"Error in index computation"};
       }
   }
 };
@@ -70,10 +137,10 @@ struct print_combination
 template <int n, int k = n>
 void pascal(unsigned int padding=n)
 {
-  const unsigned int x = TE::Combinations<n, k>::size();
-  const unsigned int y = TE::binomial(n, k);
+  const unsigned int x = TPCC::Combinations<n, k>::size();
+  const unsigned int y = TPCC::binomial(n, k);
   if (x != y)
-    throw y;
+    throw std::domain_error{"Size of combination wrong"};
   char xc[x];
   char yc[y];
   
@@ -83,7 +150,7 @@ void pascal(unsigned int padding=n)
     std::cout << ',';
   std::cout << std::setw(4) << x;
   if (x != pascal_data[10-n][k])
-    throw (n);
+    throw std::logic_error{"Value in Pascal's triangle wrong"};
   if constexpr (k > 0)
     pascal<n, k-1>(padding);
   else
@@ -103,10 +170,12 @@ int main()
   //  std::cout << a << std::endl;
   std::cout << "Pascal" << std::endl;
   pascal<10>();
+  print_combination<5, 0>::doit();
   print_combination<5, 1>::doit();
   print_combination<5, 2>::doit();
   print_combination<5, 3>::doit();
   print_combination<5, 4>::doit();
+  print_combination<5, 5>::doit();
   std::cout << std::endl;
   //  print_combination<6, 4, Combinations<6, 4>::size() - 1>::doit();
 }
