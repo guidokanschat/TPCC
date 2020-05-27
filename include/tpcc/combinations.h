@@ -97,7 +97,9 @@ public:
   /**
    * \brief The combination obtained by eliminating the `i`th element
    */
-  constexpr Combination<n,k-1,T> eliminate (unsigned int i) const
+  template <int kk=k>
+  constexpr typename std::enable_if<(kk>0),Combination<n,k-1,T> >::type
+  eliminate (unsigned int i) const
   {
       std::array<T,k-1> outdata{};
       for (unsigned int j=0;j<i;++j)
@@ -120,7 +122,7 @@ public:
           outcdata[n-k] = tmp;
       return Combination<n,k-1>{outdata, outcdata};
   }
-  
+
   /**
    * \brief Print the content of this object for debugging.
    */
@@ -135,6 +137,8 @@ public:
   
   };
 
+
+  
 /**
  * The combinations of `k` elements out of `n` as a container.
  *
