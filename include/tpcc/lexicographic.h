@@ -1,7 +1,7 @@
 #ifndef TPCC_LEXICOGRAPHIC_H
 #define TPCC_LEXICOGRAPHIC_H
 
-#include <tpcc/combinations.h>
+#include <tpcc/element.h>
 
 namespace TPCC
 {
@@ -38,32 +38,7 @@ namespace TPCC
     typedef Sint fiber_index_t;
     typedef Tint dimension_index_t;
     
-    /**
-     * \brief Descriptor for a facet of dimension `k` in the complex
-     */
-    struct Element
-    {
-      Combination<n,k> directions;
-      std::array<Sint, k> position_along;
-      std::array<Sint,n-k> position_across;
-
-      void print_debug(std::ostream& os) const
-      {
-	directions.print_debug(os);
-	os << " (";
-	std::array<Sint, n> data;
-	for (unsigned int i=0;i<k;++i)
-	  data[directions.in(i)] = position_along[i];
-	for (unsigned int i=0;i<n-k;++i)
-	  data[directions.out(i)] = position_across[i];
-	
-	for (unsigned int i=0;i<n-1;++i)
-	  os << data[i] << ',';
-	os << data[n-1] << ")";
-      }
-    };
-
-    typedef Element value_type;
+    typedef Element<n,k,Sint,Tint> value_type;
     
     /**
      * \brief Constructor setting the dimensions of the complex.
@@ -106,16 +81,16 @@ namespace TPCC
     /**
      * \brief Descriptor for the element at given `index`.
      */
-    Element operator[] (Bint index) const;
+    value_type operator[] (Bint index) const;
 
     /**
      * \brief Find index of a given element.
      */
-    Bint index (const Element& e) const;
+    Bint index (const value_type& e) const;
   };    
 
 template <int n, int k, typename Bint, typename Sint, typename Tint>
-typename Lexicographic<n,k,Bint,Sint,Tint>::Element
+Element<n,k,Sint,Tint>
 Lexicographic<n,k,Bint,Sint,Tint>::operator[] (Bint index) const
 {
   unsigned int b=0;
@@ -147,12 +122,12 @@ Lexicographic<n,k,Bint,Sint,Tint>::operator[] (Bint index) const
       across[i] = index % fdim;
       index /= fdim;
     }
-  return Element{combination, along, across};
+  return Element<n,k,Sint,Tint>{combination, along, across};
 }
 
 template <int n, int k, typename Bint, typename Sint, typename Tint>
 Bint
-Lexicographic<n,k,Bint,Sint,Tint>::index (const Element& e) const
+Lexicographic<n,k,Bint,Sint,Tint>::index (const value_type& e) const
 {
   Bint ci = Combinations<n,k>::index(e.directions);
   Bint result = 0;
