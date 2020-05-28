@@ -141,8 +141,6 @@ void pascal(unsigned int padding=n)
   const unsigned int y = TPCC::binomial(n, k);
   if (x != y)
     throw std::domain_error{"Size of combination wrong"};
-  char xc[x];
-  char yc[y];
   
   if (k==n)
     std::cout << '{';

@@ -16,10 +16,10 @@ constexpr T binomial(T n, T k)
 {
   if (n < k)
     return 0;
-  unsigned int result = 1;
+  T result = 1;
   if (k > n / 2)
     k = n - k;
-  for (unsigned int i = 1; i <= k; ++i)
+  for (T i = 1; i <= k; ++i)
   {
     result *= n + 1 - i;
     result /= i;
@@ -241,7 +241,10 @@ template <int n, int k>
 std::array<unsigned int, k> Combinations<n, k>::value(unsigned int index)
 {
   if constexpr (k==0)
+  {
+      ++index; // Avoid warning about unused variable
       return std::array<unsigned int,0>();
+  }
   else
     return compute_value<k>(index);
 }

@@ -57,7 +57,7 @@ struct Element
       data[directions.in(i)] = position_along[i];
     for (unsigned int i=0;i<n-k;++i)
       data[directions.out(i)] = position_across[i];
-    
+
     for (unsigned int i=0;i<n-1;++i)
       os << data[i] << ',';
     os << data[n-1] << ")";
@@ -78,22 +78,25 @@ struct Element
     Tint i2 = index/2;
     Tint im = index%2;
     Combination<n,k-1> combi = directions.eliminate(i2);
+
     std::array<Sint, k-1> new_along{};
     for (unsigned int i=0;i<i2;++i)
       new_along[i] = position_along[i];
-    for (unsigned int i=i2+1;i<k-1;++i)
+    for (unsigned int i=i2;i<k-1;++i)
       new_along[i] = position_along[i+1];
 
     std::array<Sint, n-k+1> new_across{};
     unsigned int i=0, ii=0;
     for (;i<n-k;++i,++ii)
       {
-	if (combi.out(i) == directions.in(i2))
-	  new_across[ii++] = position_along[i2] + ((im==0) ? 0 : 1);
-	new_across[ii] = position_across[i];
+        if (combi.out(i) == directions.in(i2))
+          new_across[ii++] = position_along[i2] + ((im==0) ? 0 : 1);
+        new_across[ii] = position_across[i];
       }
     if (i==ii)
       new_across[n-k+1] = position_along[i2] + ((im==0) ? 0 : 1);
+
+    return Element<n,k-1,Sint,Tint>{combi, new_along, new_across};
   }
 };
 }
