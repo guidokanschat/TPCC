@@ -2,6 +2,7 @@
 #define TPCC_COMBINATIONS_H
 
 #include <array>
+#include <ostream>
 
 namespace TPCC
 {
