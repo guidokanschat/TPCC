@@ -6,13 +6,30 @@
 namespace TPCC
 {
   /**
-   * \brief The `k`-dimensional faces in a tensor product chain complex of dimension `n`.
+   * \brief Lexicographic enumeration of the `k`-dimensional faces in a tensor product chain complex of dimension `n`.
    *
    * \tparam n: The dimension of the tensor product (the order of the tensor)
    * \tparam k: The dimensions of the object considered
    * \tparam Bint: The big integer used for addressing in the whole tensor product
-   * \tparam Sint: The small integer used for addressing in each component
-   * \tparam Tint: The tiny integer with values addressing the components
+   * \tparam Sint: The small integer used for addressing in each fiber
+   * \tparam Tint: The tiny integer with values addressing the fibers
+   *
+   * The numbering for `k==0` and `k==n` is lexicographic with the first coordinate
+   * changing fastest and the last one slowest. For `k` between those values, the set
+   * of elements consists of `n` over `k` separate sets, one for each combination of `k`
+   * different coordinates.
+   *
+   * These sets form the slowest moving part of the enumeration, and
+   * they are enumerated based such that the elements orthogonal to the first `n-k`
+   * coordinates are first, those orthogonal to the last coordinates last.
+   *
+   * The next level in the enumaration is formed by the fact that these sets
+   * can be split into 'sheets', connected sets which are not connected to each other.
+   * They are characterized by their coordinates orthogonal to the chosen `k`. Thus, their
+   * enumeration follows a lexicographic scheme with first fastest for these coordinates.
+   *
+   * The fastes level of enumeration is inside each sheet, where again the first coordinates
+   * run fastest.
    */
   template <int n, int k, typename Bint = unsigned int, typename Sint = unsigned short, typename Tint = unsigned char>
   class Lexicographic
@@ -56,9 +73,9 @@ namespace TPCC
 	  Bint p = 1;
 	  auto combination = combinations[i];
 	  for (Tint j=0;j<k;++j)
-	    p *= dimensions[combination.in(j)];
+	    p *= dimensions[n-1-combination.in(j)];
 	  for (Tint j=0;j<n-k;++j)
-	    p *= 1 + dimensions[combination.out(j)];
+	    p *= 1 + dimensions[n-1-combination.out(j)];
 	  block_sizes[i] = p;
 	}
     }
@@ -118,43 +135,42 @@ Lexicographic<n,k,Bint,Sint,Tint>::operator[] (Bint index) const
   Combinations<n,k> combinations;
   auto combination = combinations[b];
 
-  std::array<Sint, k> along;
+  std::array<Sint, n> coordinates;
   for (unsigned int i=0;i<k;++i)
     {
-      Tint fdim = dimensions[combination.in(i)];
-      along[i] = index % fdim;
+      Sint fdim = dimensions[n-1-combination.in(i)];
+      coordinates[n-1-combination.in(i)] = index % fdim;
       index /= fdim;
     }
-  std::array<Sint, n-k> across;
   for (unsigned int i=0;i<n-k;++i)
     {
-      Tint fdim = 1 + dimensions[combination.out(i)];
-      across[i] = index % fdim;
+      Sint fdim = 1 + dimensions[n-1-combination.out(i)];
+      coordinates[n-1-combination.out(i)] = index % fdim;
       index /= fdim;
     }
-  return Element<n,k,Sint,Tint>{combination, along, across};
+  return Element<n,k,Sint,Tint>{combination, coordinates};
 }
 
 template <int n, int k, typename Bint, typename Sint, typename Tint>
 Bint
 Lexicographic<n,k,Bint,Sint,Tint>::index (const value_type& e) const
 {
-  Bint ci = Combinations<n,k>::index(e.directions);
+  Bint ci = e.direction_index();
   Bint result = 0;
   for (unsigned int i=0;i<ci;++i)
-    result += block_sizes[i];  
+    result += block_sizes[i];
 
   Bint factor = 1;
-  for (unsigned int i=0;i<k;++i)
+  for (Tint i=0;i<k;++i)
     {
-      Tint fdim = dimensions[e.directions.in(i)];
-      result += e.position_along[i] *factor;
+      Sint fdim = dimensions[e.along_direction(i)];
+      result += e.along_coordinate(i) *factor;
       factor *= fdim;
-    } 
+    }
   for (unsigned int i=0;i<n-k;++i)
     {
-      Tint fdim = 1 + dimensions[e.directions.out(i)];
-      result += e.position_across[i] *factor;
+      Tint fdim = 1 + dimensions[e.across_direction(i)];
+      result += e.across_coordinate(i) *factor;
       factor *= fdim;
     }
   return result;

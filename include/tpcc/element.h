@@ -9,22 +9,23 @@ namespace TPCC
  * \brief Tensor coordinates for a facet of dimension `k` in the complex of dimension `n`.
  *
  * Each element is characterized by its orientation and its
- * position in the complex. The orientation or #direction is
+ * position in the complex. The orientation is
  * described by a combination of `k` coordinates which span the
  * element. It has no extension across these coordinates.
  *
- * The set of elements for a fixed combination of #directions
- * consists of slices of dimension `k` through the complex. These
- * slices are indexed by the coordinates <b>not</b> spanning the
- * elements. These indices are stored in
- * #position_across. Finally, they are numbered within the
- * `k`-dimensional slice in the entry #position_along. Both fields
- * are vectors of integer coordinates in all coordinate
- * directions.
+ * The coordinates of an Element are stored in the array #positions. Its length is `n`and
+ * it is ordered the same way as the coordinates in the whole chain complex. Thus, the first entry
+ * in there refers to the 'global' first coordinate, no matter whether this is a coordinate direction
+ * in which the Element extends. These global coordinates are accessed by operator[]().
  *
- * The fields #position_along and #position_across are indexed by
- * the combination of #directions and its complement,
- * respectively.
+ * The `k` local coordinates of the Element in the directions in which it extends are accessed
+ * by along_coordinate(). Their global counterparts are numbered by along_direction().
+ *
+ * The `n-k` coordinates orthogonal to the element are accessed by across_coordinate(). The
+ * corresponding global directions are numbered by across_direction().
+ *
+ * An imbortant feature of Element is that you can obtain an Element object for each of its boundary
+ * elements through facet().
  *
  * \tparam n: The dimension of the tensor chain complex
  * \tparam k: The dimension of this element
@@ -32,18 +33,61 @@ namespace TPCC
  * \tparam Tint: The integer type used for indexing fibers, directions, etc.
  */
 template <int n, int k, typename Sint = unsigned short, typename Tint = unsigned char>
-struct Element
+class Element
 {
-  /// A Combination enumerating the coordinate directions along which the element is aligned.
-  Combination<n,k> directions;
-  /// The integer coordinates within the `k`-dimensional slice of the complex this is an element of
-  std::array<Sint, k> position_along;
-  /// The integer coordinates of the `k`-dimensional slice itself
-  std::array<Sint,n-k> position_across;
+  /**
+   * \brief A Combination enumerating the coordinate directions along which the element is aligned.
+   *
+   * Since combinations are generated in falling order, coordinates usually are referenced in ascending order,
+   * the directions are actually not the value in the combination or its complement.
+   * The index `i` returned by the combination is immediately replaced by `n-1-i`.
+   */
+  Combination<n,k> orientation;
+  /// The integer coordinates within the `n`-dimensional complex
+  std::array<Sint, n> positions;
+
+public:
+  /// Constructor with both data elements
+  template <typename T>
+  Element(const Combination<n,k>& combi, const std::array<T,n>& pos)
+    : orientation(combi), positions(pos) {}
 
   /// The number of facets in the boundary of this object
   static constexpr Tint n_facets()
   { return 2*k; }
+
+  /// The index of the combination enumerating directions
+  constexpr Tint direction_index () const
+  { return Combinations<n,k>::index(orientation); }
+
+  /// The coordinates in the `n`-dimensional chain complex
+  constexpr Sint operator[] (Tint index) const
+  { return positions[index]; }
+
+  /**
+   * \brief Mapping from local to global coordinate directions.
+   *
+   * The Element extends along `k` integer coordinates, which are mapped through #orientation
+   * to the `n` integer coordinates of the complex.
+   * This function maps the local coordinate direction of the Element to the global direction in the chain complex.
+   */
+  constexpr Tint along_direction(Tint index) const
+  { return n-1-orientation.in(index); }
+
+  /// The coordinates in the `k`-dimensional element
+  constexpr Sint along_coordinate(Tint index) const
+  { return positions[along_direction(index)]; }
+
+  /**
+   * \brief Mapping of orthogonal coordinate directions to global.
+   */
+  constexpr Tint across_direction(Tint index) const
+  { return n-1-orientation.out(index); }
+
+  /// The position of the element orthogonal to its extension
+  constexpr Sint across_coordinate(Tint index) const
+  { return positions[across_direction(index)]; }
+
   /**
    * \brief Function for printing the data stored in the element.
    *
@@ -53,17 +97,16 @@ struct Element
    */
   void print_debug(std::ostream& os) const
   {
-    directions.print_debug(os);
     os << " (";
-    std::array<Sint, n> data;
-    for (unsigned int i=0;i<k;++i)
-      data[directions.in(i)] = position_along[i];
-    for (unsigned int i=0;i<n-k;++i)
-      data[directions.out(i)] = position_across[i];
-
+    for (Tint i=0;i<k;++i)
+      os << (unsigned int) along_direction(i);
+    os << ':';
+    for (Tint i=0;i<n-k;++i)
+      os << (unsigned int) across_direction(i);
+    os << ' ';
     for (unsigned int i=0;i<n-1;++i)
-      os << data[i] << ',';
-    os << data[n-1] << ")";
+      os << positions[i] << ',';
+    os << positions[n-1] << ")";
   }
 
   /**
@@ -78,28 +121,15 @@ struct Element
    */
   constexpr Element<n,k-1,Sint,Tint> facet(Tint index) const
   {
-    Tint i2 = index/2;
-    Tint im = index%2;
-    Combination<n,k-1> combi = directions.eliminate(i2);
+    Tint i2 = index/2;  // The direction index out of k
+    Tint im = index%2;  // Lower or upper boundary in this direction?
+    Tint gi = along_direction(i2); // The global direction out of n belonging to index
+    Combination<n,k-1> combi = orientation.eliminate(i2);
+    std::array<Sint, n> new_positions = positions;
+    if (im == 1)
+      ++new_positions[gi];
 
-    std::array<Sint, k-1> new_along{};
-    for (unsigned int i=0;i<i2;++i)
-      new_along[i] = position_along[i];
-    for (unsigned int i=i2;i<k-1;++i)
-      new_along[i] = position_along[i+1];
-
-    std::array<Sint, n-k+1> new_across{};
-    unsigned int i=0, ii=0;
-    for (;i<n-k;++i,++ii)
-      {
-        if (combi.out(i) == directions.in(i2))
-          new_across[ii++] = position_along[i2] + ((im==0) ? 0 : 1);
-        new_across[ii] = position_across[i];
-      }
-    if (i==ii)
-      new_across[n-k+1] = position_along[i2] + ((im==0) ? 0 : 1);
-
-    return Element<n,k-1,Sint,Tint>{combi, new_along, new_across};
+    return Element<n,k-1,Sint,Tint>{combi, new_positions};
   }
 };
 }

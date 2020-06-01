@@ -3,8 +3,8 @@
 
 #include <tpcc/element.h>
 
-template <int n, int k, typename T>
-void test(const TPCC::Element<n,k,T>& e)
+template <int n, int k, typename T1, typename T2>
+void test(const TPCC::Element<n,k,T1,T2>& e)
 {
     e.print_debug(std::cout);
 
@@ -37,14 +37,11 @@ template <int n, int k>
 void test()
 {
     TPCC::Combinations<n,k> combinations;
-    std::array<unsigned int, k> along;
-    for (unsigned int i=0;i<k;++i)
-        along[i] = fibonacci(k+i);
-    std::array<unsigned int, n-k> across;
-    for (unsigned int i=0;i<n-k;++i)
-        across[i] = fibonacci(n+i);
+    std::array<unsigned int, n> positions;
+    for (unsigned int i=0;i<n;++i)
+        positions[i] = fibonacci(k+i);
 
-    TPCC::Element<n,k,unsigned int> e{combinations[combinations.size()/3], along, across};
+    TPCC::Element<n,k,unsigned int, unsigned short> e{combinations[combinations.size()/3], positions};
     test(e);
 }
 
