@@ -6,13 +6,30 @@
 namespace TPCC
 {
   /**
-   * \brief The `k`-dimensional faces in a tensor product chain complex of dimension `n`.
+   * \brief Lexicographic enumeration of the `k`-dimensional faces in a tensor product chain complex of dimension `n`.
    *
    * \tparam n: The dimension of the tensor product (the order of the tensor)
    * \tparam k: The dimensions of the object considered
    * \tparam Bint: The big integer used for addressing in the whole tensor product
-   * \tparam Sint: The small integer used for addressing in each component
-   * \tparam Tint: The tiny integer with values addressing the components
+   * \tparam Sint: The small integer used for addressing in each fiber
+   * \tparam Tint: The tiny integer with values addressing the fibers
+   *
+   * The numbering for `k==0` and `k==n` is lexicographic with the first coordinate
+   * changing fastest and the last one slowest. For `k` between those values, the set
+   * of elements consists of `n` over `k` separate sets, one for each combination of `k`
+   * different coordinates.
+   *
+   * These sets form the slowest moving part of the enumeration, and
+   * they are enumerated based such that the elements orthogonal to the first `n-k`
+   * coordinates are first, those orthogonal to the last coordinates last.
+   *
+   * The next level in the enumaration is formed by the fact that these sets
+   * can be split into 'sheets', connected sets which are not connected to each other.
+   * They are characterized by their coordinates orthogonal to the chosen `k`. Thus, their
+   * enumeration follows a lexicographic scheme with first fastest for these coordinates.
+   *
+   * The fastes level of enumeration is inside each sheet, where again the first coordinates
+   * run fastest.
    */
   template <int n, int k, typename Bint = unsigned int, typename Sint = unsigned short, typename Tint = unsigned char>
   class Lexicographic
