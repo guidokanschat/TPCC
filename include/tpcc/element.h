@@ -32,18 +32,49 @@ namespace TPCC
  * \tparam Tint: The integer type used for indexing fibers, directions, etc.
  */
 template <int n, int k, typename Sint = unsigned short, typename Tint = unsigned char>
-struct Element
+class Element
 {
-  /// A Combination enumerating the coordinate directions along which the element is aligned.
+  /**
+   * \brief A Combination enumerating the coordinate directions along which the element is aligned.
+   *
+   * Since combinations are generated in falling order, coordinates usually are referenced in ascending order,
+   * the directions are actually not the value in the combination or its complement.
+   * The index `i` returned by the combination is immediately replaced by `n-1-i`.
+   */
   Combination<n,k> directions;
-  /// The integer coordinates within the `k`-dimensional slice of the complex this is an element of
-  std::array<Sint, k> position_along;
-  /// The integer coordinates of the `k`-dimensional slice itself
-  std::array<Sint,n-k> position_across;
+  /// The integer coordinates within the `n`-dimensional complex
+  std::array<Sint, n> positions;
+
+public:
+  /// Constructor with both data elements
+  template <typename T>
+  Element(const Combination<n,k>& combi, const std::array<T,n>& pos)
+    : directions(combi), positions(pos) {}
 
   /// The number of facets in the boundary of this object
   static constexpr Tint n_facets()
   { return 2*k; }
+
+  /// The index of the combination enumerating directions
+  constexpr Tint direction_index () const
+  { return Combinations<n,k>::index(directions); }
+
+  /// The coordinates in the `n`-dimensional chain complex
+  constexpr Sint operator[] (Tint index) const
+  { return positions[index]; }
+
+  /**
+   * \brief The coordinate direction out of `n` in the complex for the coordinate direction out of `k` of the element
+   *
+   * The Element extends along `k` integer coordinates, which are mapped through #directions to the `n` integer coordinates of the complex.
+   * This function maps the local coordinate direction of the Element to the global direction in the chain complex.
+   */
+  constexpr Sint along(Tint index) const
+  { return n-1-directions.in(index); }
+
+  /// The coordinates in the `k`-dimensional mesh
+  constexpr Sint coordinate_along(Tint index) const
+  { return positions[along(index)]; }
   /**
    * \brief Function for printing the data stored in the element.
    *
@@ -53,17 +84,16 @@ struct Element
    */
   void print_debug(std::ostream& os) const
   {
-    directions.print_debug(os);
     os << " (";
-    std::array<Sint, n> data;
-    for (unsigned int i=0;i<k;++i)
-      data[directions.in(i)] = position_along[i];
-    for (unsigned int i=0;i<n-k;++i)
-      data[directions.out(i)] = position_across[i];
-
+    for (Tint i=0;i<k;++i)
+      os << along(i);
+    os << ':';
+    for (Tint i=0;i<n-k;++i)
+      os << n-1-directions.out(i);
+    os << ' ';
     for (unsigned int i=0;i<n-1;++i)
-      os << data[i] << ',';
-    os << data[n-1] << ")";
+      os << positions[i] << ',';
+    os << positions[n-1] << ")";
   }
 
   /**
@@ -78,28 +108,15 @@ struct Element
    */
   constexpr Element<n,k-1,Sint,Tint> facet(Tint index) const
   {
-    Tint i2 = index/2;
-    Tint im = index%2;
+    Tint i2 = index/2;  // The direction index out of k
+    Tint im = index%2;  // Lower or upper boundary in this direction?
+    Tint gi = along(i2); // The global direction out of n belonging to index
     Combination<n,k-1> combi = directions.eliminate(i2);
+    std::array<Sint, n> new_positions = positions;
+    if (im == 1)
+      ++new_positions[gi];
 
-    std::array<Sint, k-1> new_along{};
-    for (unsigned int i=0;i<i2;++i)
-      new_along[i] = position_along[i];
-    for (unsigned int i=i2;i<k-1;++i)
-      new_along[i] = position_along[i+1];
-
-    std::array<Sint, n-k+1> new_across{};
-    unsigned int i=0, ii=0;
-    for (;i<n-k;++i,++ii)
-      {
-        if (combi.out(i) == directions.in(i2))
-          new_across[ii++] = position_along[i2] + ((im==0) ? 0 : 1);
-        new_across[ii] = position_across[i];
-      }
-    if (i==ii)
-      new_across[n-k+1] = position_along[i2] + ((im==0) ? 0 : 1);
-
-    return Element<n,k-1,Sint,Tint>{combi, new_along, new_across};
+    return Element<n,k-1,Sint,Tint>{combi, new_positions};
   }
 };
 }

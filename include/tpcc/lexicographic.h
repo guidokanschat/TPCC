@@ -132,31 +132,31 @@ Lexicographic<n,k,Bint,Sint,Tint>::operator[] (Bint index) const
       across[i] = index % fdim;
       index /= fdim;
     }
-  return Element<n,k,Sint,Tint>{combination, along, across};
+  //return Element<n,k,Sint,Tint>{combination, along, across};
 }
 
 template <int n, int k, typename Bint, typename Sint, typename Tint>
 Bint
 Lexicographic<n,k,Bint,Sint,Tint>::index (const value_type& e) const
 {
-  Bint ci = Combinations<n,k>::index(e.directions);
+  Bint ci = e.direction_index();
   Bint result = 0;
-  for (unsigned int i=0;i<ci;++i)
-    result += block_sizes[i];  
+//  for (unsigned int i=0;i<ci;++i)
+//    result += block_sizes[i];
 
-  Bint factor = 1;
-  for (unsigned int i=0;i<k;++i)
-    {
-      Tint fdim = dimensions[e.directions.in(i)];
-      result += e.position_along[i] *factor;
-      factor *= fdim;
-    } 
-  for (unsigned int i=0;i<n-k;++i)
-    {
-      Tint fdim = 1 + dimensions[e.directions.out(i)];
-      result += e.position_across[i] *factor;
-      factor *= fdim;
-    }
+//  Bint factor = 1;
+//  for (unsigned int i=0;i<k;++i)
+//    {
+//      Tint fdim = dimensions[e.directions.in(i)];
+//      result += e.position_along[i] *factor;
+//      factor *= fdim;
+//    }
+//  for (unsigned int i=0;i<n-k;++i)
+//    {
+//      Tint fdim = 1 + dimensions[e.directions.out(i)];
+//      result += e.position_across[i] *factor;
+//      factor *= fdim;
+//    }
   return result;
 }
   
