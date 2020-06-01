@@ -30,14 +30,18 @@ namespace TPCC
     static constexpr Tint order()
     { return n; }
 
-    /// The dimension of the elements
+    /// The dimension of the elements, index in the chain complex
     static constexpr Tint cell_dimension()
     { return k; }
 
+    /// Index type for addressing in the tensor product
     typedef Bint global_index_t;
+    /// Index type for addressing in the fibers
     typedef Sint fiber_index_t;
+    /// Index type for addressing dimensions and elements of the chain complex
     typedef Tint dimension_index_t;
     
+    /// The type of elements of this set in the complex
     typedef Element<n,k,Sint,Tint> value_type;
     
     /**
@@ -87,6 +91,12 @@ namespace TPCC
      * \brief Find index of a given element.
      */
     Bint index (const value_type& e) const;
+
+    constexpr Lexicographic<n,k-1,Bint,Sint,Tint>
+    boundary() const
+    {
+      return Lexicographic<n,k-1,Bint,Sint,Tint>{dimensions};
+    }
   };    
 
 template <int n, int k, typename Bint, typename Sint, typename Tint>

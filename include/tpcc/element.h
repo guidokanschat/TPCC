@@ -41,6 +41,9 @@ struct Element
   /// The integer coordinates of the `k`-dimensional slice itself
   std::array<Sint,n-k> position_across;
 
+  /// The number of facets in the boundary of this object
+  static constexpr Tint n_facets()
+  { return 2*k; }
   /**
    * \brief Function for printing the data stored in the element.
    *
