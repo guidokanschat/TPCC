@@ -1,3 +1,7 @@
+// Unit test:
+// Lexicographic::index()
+// Lexicographic::operator[]
+
 #include <iostream>
 #include <iomanip>
 

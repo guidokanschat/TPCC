@@ -1,4 +1,4 @@
-// Unit tests:
+// Unit test:
 // Lexicographic::size()
 // Lexicographic::block_size()
 
@@ -11,13 +11,13 @@
 const unsigned int size2[] = { 12, 17, 6};
 const unsigned int size3[] = { 60, 133, 98, 24 };
 const unsigned int block_sizes20[] = { 12 };
-const unsigned int block_sizes21[] = { 8,9 };
+const unsigned int block_sizes21[] = { 9, 8 };
 const unsigned int block_sizes22[] = { 6 };
 const unsigned int *block_sizes2[] =
 { block_sizes20, block_sizes21, block_sizes22 };
 const unsigned int block_sizes30[] = { 60 };
-const unsigned int block_sizes31[] = { 40,45,48 };
-const unsigned int block_sizes32[] = { 30,32,36 };
+const unsigned int block_sizes31[] = { 48,45,40 };
+const unsigned int block_sizes32[] = { 36,32,30 };
 const unsigned int block_sizes33[] = { 24 };
 const unsigned int *block_sizes3[] =
 { block_sizes30, block_sizes31, block_sizes32, block_sizes33 };

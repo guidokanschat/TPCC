@@ -21,16 +21,12 @@ void print_mesh(const TPCC::Lexicographic<n,k>& mesh)
     {
       auto element = mesh[i];
       std::cout << std::setw(4) << i << " {";
-      element.print_debug(std::cout);
-      std::cout << "\n";
       for (unsigned int i=0;i<element.n_facets();++i)
         {
           element.facet(i).print_debug(std::cout);
           std::cout << std::setw(4)
                     <<  boundary.index(element.facet(i))
                     << ",";
-          std::cout << "\n";
-
         }
 
       std::cout << " }," << std::endl;

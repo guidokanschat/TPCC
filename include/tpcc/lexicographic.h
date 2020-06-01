@@ -56,9 +56,9 @@ namespace TPCC
 	  Bint p = 1;
 	  auto combination = combinations[i];
 	  for (Tint j=0;j<k;++j)
-	    p *= dimensions[combination.in(j)];
+	    p *= dimensions[n-1-combination.in(j)];
 	  for (Tint j=0;j<n-k;++j)
-	    p *= 1 + dimensions[combination.out(j)];
+	    p *= 1 + dimensions[n-1-combination.out(j)];
 	  block_sizes[i] = p;
 	}
     }
@@ -118,21 +118,20 @@ Lexicographic<n,k,Bint,Sint,Tint>::operator[] (Bint index) const
   Combinations<n,k> combinations;
   auto combination = combinations[b];
 
-  std::array<Sint, k> along;
+  std::array<Sint, n> coordinates;
   for (unsigned int i=0;i<k;++i)
     {
-      Tint fdim = dimensions[combination.in(i)];
-      along[i] = index % fdim;
+      Sint fdim = dimensions[n-1-combination.in(i)];
+      coordinates[n-1-combination.in(i)] = index % fdim;
       index /= fdim;
     }
-  std::array<Sint, n-k> across;
   for (unsigned int i=0;i<n-k;++i)
     {
-      Tint fdim = 1 + dimensions[combination.out(i)];
-      across[i] = index % fdim;
+      Sint fdim = 1 + dimensions[n-1-combination.out(i)];
+      coordinates[n-1-combination.out(i)] = index % fdim;
       index /= fdim;
     }
-  //return Element<n,k,Sint,Tint>{combination, along, across};
+  return Element<n,k,Sint,Tint>{combination, coordinates};
 }
 
 template <int n, int k, typename Bint, typename Sint, typename Tint>
@@ -141,22 +140,22 @@ Lexicographic<n,k,Bint,Sint,Tint>::index (const value_type& e) const
 {
   Bint ci = e.direction_index();
   Bint result = 0;
-//  for (unsigned int i=0;i<ci;++i)
-//    result += block_sizes[i];
+  for (unsigned int i=0;i<ci;++i)
+    result += block_sizes[i];
 
-//  Bint factor = 1;
-//  for (unsigned int i=0;i<k;++i)
-//    {
-//      Tint fdim = dimensions[e.directions.in(i)];
-//      result += e.position_along[i] *factor;
-//      factor *= fdim;
-//    }
-//  for (unsigned int i=0;i<n-k;++i)
-//    {
-//      Tint fdim = 1 + dimensions[e.directions.out(i)];
-//      result += e.position_across[i] *factor;
-//      factor *= fdim;
-//    }
+  Bint factor = 1;
+  for (Tint i=0;i<k;++i)
+    {
+      Sint fdim = dimensions[e.along_direction(i)];
+      result += e.along_coordinate(i) *factor;
+      factor *= fdim;
+    }
+  for (unsigned int i=0;i<n-k;++i)
+    {
+      Tint fdim = 1 + dimensions[e.across_direction(i)];
+      result += e.across_coordinate(i) *factor;
+      factor *= fdim;
+    }
   return result;
 }
   

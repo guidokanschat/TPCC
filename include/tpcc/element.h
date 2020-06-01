@@ -69,13 +69,19 @@ public:
    * The Element extends along `k` integer coordinates, which are mapped through #directions to the `n` integer coordinates of the complex.
    * This function maps the local coordinate direction of the Element to the global direction in the chain complex.
    */
-  constexpr Sint along(Tint index) const
+  constexpr Tint along_direction(Tint index) const
   { return n-1-directions.in(index); }
 
   /// The coordinates in the `k`-dimensional mesh
-  constexpr Sint coordinate_along(Tint index) const
-  { return positions[along(index)]; }
-  /**
+  constexpr Sint along_coordinate(Tint index) const
+  { return positions[along_direction(index)]; }
+
+  constexpr Tint across_direction(Tint index) const
+  { return n-1-directions.out(index); }
+
+  /// The coordinate in the `k`-dimensional mesh
+  constexpr Sint across_coordinate(Tint index) const
+  { return positions[across_direction(index)]; }  /**
    * \brief Function for printing the data stored in the element.
    *
    * \note This function is also used in the consistency tests,
@@ -86,10 +92,10 @@ public:
   {
     os << " (";
     for (Tint i=0;i<k;++i)
-      os << along(i);
+      os << (unsigned int) along_direction(i);
     os << ':';
     for (Tint i=0;i<n-k;++i)
-      os << n-1-directions.out(i);
+      os << (unsigned int) across_direction(i);
     os << ' ';
     for (unsigned int i=0;i<n-1;++i)
       os << positions[i] << ',';
@@ -110,7 +116,7 @@ public:
   {
     Tint i2 = index/2;  // The direction index out of k
     Tint im = index%2;  // Lower or upper boundary in this direction?
-    Tint gi = along(i2); // The global direction out of n belonging to index
+    Tint gi = along_direction(i2); // The global direction out of n belonging to index
     Combination<n,k-1> combi = directions.eliminate(i2);
     std::array<Sint, n> new_positions = positions;
     if (im == 1)
