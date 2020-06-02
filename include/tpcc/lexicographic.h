@@ -99,6 +99,12 @@ namespace TPCC
       return block_sizes[block];
     }
 
+    /// Dimension of the fiber with given index in the tensor product
+    constexpr Sint fiber_dimension(Tint i) const
+    {
+      return dimensions[i];
+    }
+
     /**
      * \brief Descriptor for the element at given `index`.
      */
