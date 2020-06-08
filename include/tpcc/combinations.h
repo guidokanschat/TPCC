@@ -45,7 +45,7 @@ constexpr T binomial(T n, T k)
       
       for (unsigned int i=0;i<n-k;++i,--current)
 	{
-	  while (current==combi[vpos] && vpos<k)
+	  while (current==combi[vpos])
 	    {
 	      --current;
 	      ++vpos;
