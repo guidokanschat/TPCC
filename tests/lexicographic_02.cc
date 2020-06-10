@@ -12,8 +12,8 @@ constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
 constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
 constexpr std::array<unsigned short, 4> dim4 {{ 1,2,3,4 }};
 
-template <int n, int k>
-void print_mesh(const TPCC::Lexicographic<n,k>& mesh)
+template <class MESH>
+void print_mesh(const MESH& mesh)
 {
   for (unsigned int i=0;i<mesh.size();++i)
     {
@@ -26,34 +26,34 @@ void print_mesh(const TPCC::Lexicographic<n,k>& mesh)
     }
 }
 
-template <int k>
+template <unsigned int k>
 void test_1()
 {
-  TPCC::Lexicographic<1,k> mesh = dim1;
+  TPCC::Lexicographic<1u,k> mesh = dim1;
   std::cout << "Mesh-Dim: " << 1 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }
 
-template <int k>
+template <unsigned int k>
 void test_2()
 {
-  TPCC::Lexicographic<2,k> mesh = dim2;
+  TPCC::Lexicographic<2u,k> mesh = dim2;
   std::cout << "Mesh-Dim: " << 2 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }
 
-template <int k>
+template <unsigned int k>
 void test_3()
 {
-  TPCC::Lexicographic<3,k> mesh = dim3;
+  TPCC::Lexicographic<3u,k> mesh = dim3;
   std::cout << "Mesh-Dim: " << 3 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }
 
-template <int k>
+template <unsigned int k>
 void test_4()
 {
-  TPCC::Lexicographic<4,k> mesh = dim4;
+  TPCC::Lexicographic<4u,k> mesh = dim4;
   std::cout << "Mesh-Dim: " << 4 << " Element-Dim: " << k << std::endl;
   print_mesh(mesh);
 }

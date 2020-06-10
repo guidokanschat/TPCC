@@ -13,8 +13,8 @@ constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
 constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
 constexpr std::array<unsigned short, 4> dim4 {{ 1,2,3,4 }};
 
-template <int n, int k>
-void print_mesh(const TPCC::Lexicographic<n,k>& mesh)
+template <class MESH>
+void print_mesh(const MESH& mesh)
 {
   auto boundary = mesh.boundary();
   for (unsigned int i=0;i<mesh.size();++i)
@@ -35,7 +35,7 @@ void print_mesh(const TPCC::Lexicographic<n,k>& mesh)
     }
 }
 
-template <int k>
+template <unsigned int k>
 void test_1()
 {
   TPCC::Lexicographic<1,k> mesh = dim1;
@@ -43,7 +43,7 @@ void test_1()
   print_mesh(mesh);
 }
 
-template <int k>
+template <unsigned int k>
 void test_2()
 {
   TPCC::Lexicographic<2,k> mesh = dim2;
@@ -51,7 +51,7 @@ void test_2()
   print_mesh(mesh);
 }
 
-template <int k>
+template <unsigned int k>
 void test_3()
 {
   TPCC::Lexicographic<3,k> mesh = dim3;
@@ -59,7 +59,7 @@ void test_3()
   print_mesh(mesh);
 }
 
-template <int k>
+template <unsigned int k>
 void test_4()
 {
   TPCC::Lexicographic<4,k> mesh = dim4;
