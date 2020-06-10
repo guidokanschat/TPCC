@@ -26,4 +26,4 @@ INPUT                  = @DOXYGEN_INPUT@
 EXAMPLE_PATH           = @DOXYGEN_INPUT@
 RECURSIVE	       = YES
 
-UML_LOOK	       = NO
+UML_LOOK	       = YES

@@ -19,7 +19,7 @@ void test(const TPCC::Element<n,k,T1,T2>& e)
 
 constexpr unsigned int fibonacci(unsigned int i)
 {
-    if (i==0 && i==1)
+    if (i==0 || i==1)
         return i;
 
     unsigned int i0 = 1;
