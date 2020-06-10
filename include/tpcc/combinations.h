@@ -36,16 +36,16 @@ constexpr T binomial(T n, T k)
    * \todo Make this constexpr
    */
   template < typename T=unsigned int, T n, T k>
-  std::array<T,n-k>
+  constexpr std::array<T,n-k>
   compute_complement(std::array<T,k> combi)
   {
-      std::array<unsigned int, n - k> result;
+    std::array<unsigned int, n - k> result{};
       unsigned int vpos = 0;
       unsigned int current = n-1;
       
       for (unsigned int i=0;i<n-k;++i,--current)
 	{
-	  while (current==combi[vpos] && vpos<k)
+	  while (vpos<k && current==combi[vpos])
 	    {
 	      --current;
 	      ++vpos;
@@ -97,6 +97,8 @@ public:
   
   /**
    * \brief The combination obtained by eliminating the `i`th element
+   *
+   * \note The return value type declaration with `std::enable_if` eliminates this function for `k==0`, since you cannot remove an item from an empty set.
    */
   template <int kk=k>
   constexpr typename std::enable_if<(kk>0),Combination<n,k-1,T> >::type
@@ -108,6 +110,7 @@ public:
       const T tmp = data[i];
       for (unsigned int j=i;j<k-1;++j)
         outdata[j] = data[j+1];
+
       std::array<T,n-k+1> outcdata{};
       unsigned int jj=0,j=0;
       for (;j<n-k;++j,++jj)
@@ -122,6 +125,39 @@ public:
       if (jj==j)
           outcdata[n-k] = tmp;
       return Combination<n,k-1>{outdata, outcdata};
+  }
+  /**
+   * \brief The combination obtained by adding the element `i`.
+   *
+   * \note The return value type declaration with `std::enable_if` eliminates this function for `k==n`, since you cannot choose more than `n` items out of `n`.
+   */
+  template <int kk=k>
+  constexpr typename std::enable_if<(kk<n),Combination<n,k+1,T> >::type
+  add (unsigned int i) const
+  {
+      std::array<T,k+1> outdata{};
+      unsigned int jj=0,j=0;
+      for (;j<k;++j,++jj)
+          {
+            if (jj==j && data[j]<i)
+                {
+                    outdata[j] = i;
+                    ++jj;
+                }
+            outdata[jj] = data[j];
+          }
+      if (jj==j)
+          outdata[k] = i;
+
+      std::array<T,n-k-1> outcdata{};
+      j=0;jj=0;
+      for (;j<n-k-1;++j,++jj)
+          {
+            if (cdata[j]==i)
+              ++jj;
+            outcdata[j] = cdata[jj];
+          }
+      return Combination<n,k+1>{outdata, outcdata};
   }
 
   /**
