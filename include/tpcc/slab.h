@@ -14,7 +14,7 @@ namespace TPCC
  * which extend in the normal direction. In this respect, it differs from a CutPlane which
  * contains elements within a hyperplane characterized by the same data.
  *
- * \note The data member #superset is currently s reference, which might become outdated.
+ * \note The data member #superset is currently a reference, which might become outdated.
  * We could replace it by some kind of smartpointer, but this induces overhead. AS of now,
  * the focus of this project is on minimal overhead, such that we can use the functions for
  * the managing of high order cochain finite elements on each mesh cell. Thus, we trade off
@@ -25,9 +25,23 @@ class Slab
 {
    typedef Lexicographic<n,k,Bint,Sint,Tint> super_class;
    const Lexicographic<n,k,Bint,Sint,Tint>& superset;
+   const std::array<Tint,n-1> directions;
+   const std::array<bool, n-1> reverse;
    const Tint normal_direction;
    const Sint normal_coordinate;
-   const std::array<bool, n> reverse;
+   const Lexicographic<n-1,((k>0) ? k-1:0),Bint,Sint,Tint> aux;
+
+   /// Compute the dimensions of the auxiliary object
+   static constexpr std::array<Sint,n-1>
+   aux_dimensions (const Lexicographic<n,k,Bint,Sint,Tint>& from,
+                   const std::array<Tint,n-1>& directions)
+   {
+     std::array<Sint,n-1> result;
+     for (Tint i=0;i<n-1;++i)
+       result[i] = from.fiber_dimension(directions[i]);
+     return result;
+   }
+
    /**
     * \brief The number of objects facing the same directions.
     */
@@ -35,40 +49,24 @@ class Slab
 
 public:
    constexpr Slab(const Lexicographic<n,k,Bint,Sint,Tint>& from,
-                  Tint normal_direction, Tint normal_coordinate, const std::array<bool,n>& reverse)
+                  const std::array<Tint,n-1> directions,
+                  const std::array<bool,n-1>& reverse,
+                  Tint normal_direction,
+                  Sint normal_coordinate)
        : superset(from),
+         directions(directions),
+         reverse(reverse),
          normal_direction(normal_direction),
          normal_coordinate(normal_coordinate),
-         reverse(reverse),
-         block_sizes{}
+         aux(aux_dimensions(from, directions))
    {
-       Combinations<n,k> combinations;
-       for (Tint i=0;i<binomial(n,k);++i)
-         {
-           Bint p = 1;
-           auto combination = combinations[i];
-           bool is_aligned = false;
-           for (Tint j=0;j<k;++j)
-             {
-               if (normal_direction == n-1-combination.in(j))
-                    is_aligned = true;
-                else
-                   p *= superset.fiber_dimension(n-1-combination.in(j));
-             }
-           if (!is_aligned)
-             continue;
-           for (Tint j=0;j<n-k;++j)
-             p *= 1 + superset.fiber_dimension(n-1-combination.out(j));
-           block_sizes[i] = p;
-         }
+     static_assert(k>=1, "Element dimension of slab must be at least 1");
    }
+
 
    constexpr Bint size() const
    {
-     Bint sum = 0;
-     for (unsigned int i=0;i<block_sizes.size();++i)
-       sum += block_sizes[i];
-     return sum;
+     return aux.size();
    }
 
    /**
@@ -76,18 +74,45 @@ public:
     */
    constexpr Bint block_size (Tint block) const
    {
-     return block_sizes[block];
+     return aux.block_size(block);
    }
 
    /**
     * \brief The element at position index, in the coordinates of the whole chain complex.
     *
     * The index refers to lexicographic ordering in the local coordinates of the Slab,
-    * as defined by #normal_direction and #reverse. The Element returned has its coordinates in
+    * as defined by #directions and #reverse. The Element returned has its coordinates in
     * the superset. Thus, it contains a field for a coordinate #normal_direction and the value
     * of this coordinate is always #normal_coordinate.
+    *
+    * \section3 Implementation
+    *
+    * Enumeration of the cells uses the object #aux, which contains a cut through the slab.
+    * Thus, all elements of the slab can be constructed from elements of #aux by adding the #normal_direction
+    * of the slab as a direction along the element. Its coordinate is the #normal_coordinate.
+    *
+    * All other coordinates of the constructed element are determined according to #directions and #reverse.
+    * First, each direction `d` in #aux is mapped to the direction `directions[d]` in the #superset.
+    * Then, the coordinate in this direction is computed using #reverse as either the same as the one in
+    * #aux or the one obtained by subtracting this from the fiber dimension.
     */
-   constexpr Element<n,k,Sint,Tint> operator[] (Bint index) const;
+   constexpr Element<n,k,Sint,Tint> operator[] (Bint index) const
+   {
+     auto local = aux[index];
+     // `local` contains a cut through the elements of the slab. Thus, copy the along directions.
+     std::array<Sint,n> coordinates{};
+     for (Tint i=0;i<k-1;++i)
+       {
+         const Sint c = local.along_coordinate(i);
+         const Tint d = directions[local.along_direction(i)];
+         coordinates[d] = reverse[i] ? (superset.fiber_dimension(d)-c-1) : (c);
+       }
+     // By definition of a slab, the normal_direction is an along_direction of its elements
+     coordinates[normal_direction] = normal_coordinate;
+     // The remaining coordinates are just copied
+     for (Tint i=0;i<n-k;++i)
+       coordinates[directions[local.across_direction(i)]] = local.across_coordinate(i);
+   }
 };
 }
 

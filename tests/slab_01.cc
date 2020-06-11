@@ -1,8 +1,10 @@
 #include <iostream>
 #include <iomanip>
+#include <array>
 
 #include <tpcc/slab.h>
 
+constexpr std::array<unsigned short, 1> dim1 {{ 2 }};
 constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
 constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
 
@@ -12,7 +14,7 @@ void test(const TPCC::Slab<n,k,B,S,T>& slab)
   std::cout << "  Slab-size: " << slab.size() << std::endl;
 //  if (mesh.size() != size2[k])
 //    throw std::logic_error("Mesh sizes differ!");
-  for (unsigned int i=0;i<TPCC::binomial(n,k);++i)
+  for (unsigned int i=0;i<TPCC::binomial(n-1,k-1);++i)
     {
       std::cout << "    Block-size " << i << ":\t" << slab.block_size(i) << std::endl;
 //      if (mesh.block_size(i) != block_sizes2[k][i])
@@ -20,48 +22,43 @@ void test(const TPCC::Slab<n,k,B,S,T>& slab)
     }
 }
 
-template <int k>
-void test_2()
+template <int k, class A>
+void constexpr test(const A& arr)
 {
-  const unsigned int n=2;
-  TPCC::Lexicographic<n,k> mesh = dim2;
+  const unsigned int n = std::tuple_size<A>::value;
+  typedef TPCC::Lexicographic<n,k> Mesh;
+  Mesh mesh{arr};
   std::cout << "Lexicographic<" << n
             << "," << k << ">::size = "
             << mesh.size() << "\n";
-  std::array<bool,n> all_false{};
-  TPCC::Slab<n,k> slab0{mesh, 0, 0, all_false};
-  test(slab0);
-  TPCC::Slab<n,k> slab1{mesh, 1, 0, all_false};
-  test(slab1);
+  for (typename Mesh::dimension_index_t d=0;d<n;++d)
+    {
+      std::cout << "   Normal: " << (unsigned int) d << "\n";
+      std::array<typename Mesh::dimension_index_t,n-1> directions;
+      typename Mesh::dimension_index_t ii=0;
+      for (typename Mesh::dimension_index_t i=0;i<directions.size();++i,++ii)
+      {
+        if (i==d) ++ii;
+        directions[i] = ii;
+      }
+      std::array<bool,n-1> all_false{};
+      TPCC::Slab<n,k> slab0{mesh, directions, all_false, directions.size(), 0};
+      test(slab0);
+    }
 }
 
-
-template <int k>
-void test_3()
-{
-  const unsigned int n=3;
-  TPCC::Lexicographic<n,k> mesh = dim3;
-  std::cout << "Lexicographic<" << n
-            << "," << k << ">::size = "
-            << mesh.size() << "\n";
-  std::array<bool,n> all_false{};
-  TPCC::Slab<n,k> slab0{mesh, 0, 0, all_false};
-  test(slab0);
-  TPCC::Slab<n,k> slab1{mesh, 1, 0, all_false};
-  test(slab1);
-  TPCC::Slab<n,k> slab2{mesh, 2, 0, all_false};
-  test(slab2);
-}
 
 int main(int , char *[])
 {
-  test_2<2>();
-  test_2<1>();
-  test_2<0>();
+  test<1>(dim1);
 
-  test_3<3>();
-  test_3<2>();
-  test_3<1>();
-  test_3<0>();
+  test<2>(dim2);
+  test<1>(dim2);
+//  test<0>(dim2);
+
+  test<3>(dim3);
+  test<2>(dim3);
+  test<1>(dim3);
+//  test<0>(dim3);
   return 0;
 }

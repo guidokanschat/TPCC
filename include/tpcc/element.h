@@ -5,6 +5,7 @@
 
 namespace TPCC
 {
+  template <int n, int k, typename Bint, typename Sint, typename Tint> class Slab;
 /**
  * \brief Tensor coordinates for a facet of dimension `k` in the complex of dimension `n`.
  *
@@ -131,6 +132,9 @@ public:
 
     return Element<n,k-1,Sint,Tint>{combi, new_positions};
   }
+
+  template <int, int, typename, typename, typename>
+  friend class Slab;
 };
 }
 
