@@ -60,6 +60,9 @@ void test_4()
 
 int main()
 {
+  test_1<1>();
+  test_1<0>();
+
   test_2<2>();
   test_2<1>();
   test_2<0>();
