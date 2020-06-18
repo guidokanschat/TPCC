@@ -2,6 +2,8 @@
 #define TPCC_SLAB_H
 
 #include <tpcc/lexicographic.h>
+#include <algorithm>
+#include <cassert>
 
 namespace TPCC
 {
@@ -61,6 +63,7 @@ public:
          aux(aux_dimensions(from, directions))
    {
      static_assert(k>=1, "Element dimension of slab must be at least 1");
+     assert(std::find(directions.begin(), directions.end(), normal_direction)==directions.end());
    }
 
 
@@ -111,7 +114,13 @@ public:
      coordinates[normal_direction] = normal_coordinate;
      // The remaining coordinates are just copied
      for (Tint i=0;i<n-k;++i)
-       coordinates[directions[local.across_direction(i)]] = local.across_coordinate(i);
+       {
+         const Sint c = local.across_coordinate(i);
+         const Tint d = directions[local.across_direction(i)];
+         coordinates[d] = reverse[i] ? (superset.fiber_dimension(d)-c) : (c);
+       }
+
+     return Element<n,k,Sint,Tint>{local.orientation.add_and_expand(normal_direction), coordinates};
    }
 };
 }

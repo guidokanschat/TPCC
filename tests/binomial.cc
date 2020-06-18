@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <stdexcept>
 
+//#include <gtest/gtest.h>
+
 #include <tpcc/combinations.h>
 
 unsigned int pascal_data[11][11] =
@@ -160,7 +162,6 @@ void pascal(unsigned int padding=n)
 	pascal<n-1,n-1>(padding);
     }
 }
-
 
 int main()
 {

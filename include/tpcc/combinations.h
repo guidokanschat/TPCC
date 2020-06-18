@@ -161,6 +161,19 @@ public:
   }
 
   /**
+    * \brief The combination out of `n+1` obtained by adding one element
+    */
+  template <int kk=k>
+  constexpr typename std::enable_if<(kk<=n),Combination<n+1,k+1,T> >::type
+  add_and_expand (unsigned int i) const
+  {
+    std::array<T,n+1-k> outcdata{};
+    std::copy(cdata.begin(), cdata.end(), outcdata.begin());
+    outcdata[n-k] = n;
+    return Combination<n+1,k>{data,outcdata}.add(i);
+  }
+
+  /**
    * \brief Print the content of this object for debugging.
    */
   void print_debug(std::ostream& os) const
