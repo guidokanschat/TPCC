@@ -3,6 +3,7 @@
 
 #include <array>
 #include <ostream>
+#include <cassert>
 
 namespace TPCC
 {
@@ -139,8 +140,9 @@ public:
       unsigned int jj=0,j=0;
       for (;j<k;++j,++jj)
           {
-            if (jj==j && data[j]<i)
+            if (jj==j && data[j]<=i)
                 {
+                    assert(data[j]!=i);
                     outdata[j] = i;
                     ++jj;
                 }

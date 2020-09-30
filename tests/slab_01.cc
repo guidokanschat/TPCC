@@ -5,6 +5,9 @@
 
 #include <tpcc/slab.h>
 
+// Create slabs in dimensions 1, 2, 3
+// Verify their dimensions
+
 constexpr std::array<unsigned short, 1> dim1 {{ 2 }};
 constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
 constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
@@ -33,10 +36,10 @@ void constexpr test(const A& arr)
   Mesh mesh{arr};
   std::cout << "Lexicographic<" << n
             << "," << k << ">::size = "
-            << mesh.size() << "\n";
+            << mesh.size() << std::endl;
   for (typename Mesh::dimension_index_t d=0;d<n;++d)
     {
-      std::cout << "  Normal: " << (unsigned int) d << "\n";
+      std::cout << "  Normal: " << (unsigned int) d << std::endl;
       std::array<typename Mesh::dimension_index_t,n-1> directions;
       typename Mesh::dimension_index_t ii=0;
       for (typename Mesh::dimension_index_t i=0;i<directions.size();++i,++ii)
@@ -46,13 +49,18 @@ void constexpr test(const A& arr)
       }
       do
       {
-          std::cout << "    Directions:";
+        std::cout << "    Directions:";
         for (unsigned int i=0;i<directions.size();++i)
           std::cout << ' ' << (int) directions[i];
-        std::cout << "\n";
+        std::cout << std::endl;
         std::array<bool,n-1> all_false{};
-        TPCC::Slab<n,k> slab0{mesh, directions, all_false, directions.size(), 0};
+        std::array<bool,n-1> all_true{true};
+        TPCC::Slab<n,k> slab0{mesh, directions, all_false, d, 0};
+        std::cout << "    Slab0 created" << std::endl;
         test(slab0);
+        TPCC::Slab<n,k> slab1{mesh, directions, all_true, d, 0};
+        std::cout << "    Slab1 created" << std::endl;
+        test(slab1);
         } while (std::next_permutation(directions.begin(), directions.end()));
     }
 }

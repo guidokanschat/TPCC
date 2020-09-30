@@ -63,6 +63,7 @@ public:
          aux(aux_dimensions(from, directions))
    {
      static_assert(k>=1, "Element dimension of slab must be at least 1");
+     // Assert that normal_direction is not in the array of directions
      assert(std::find(directions.begin(), directions.end(), normal_direction)==directions.end());
    }
 
@@ -119,8 +120,8 @@ public:
          const Tint d = directions[local.across_direction(i)];
          coordinates[d] = reverse[i] ? (superset.fiber_dimension(d)-c) : (c);
        }
-
-     return Element<n,k,Sint,Tint>{local.orientation.add_and_expand(normal_direction), coordinates};
+     Tint new_direction = (normal_direction < k) ? k : normal_direction;
+     return Element<n,k,Sint,Tint>{local.orientation.add_and_expand(new_direction), coordinates};
    }
 };
 }

@@ -39,7 +39,7 @@ class Element
   /**
    * \brief A Combination enumerating the coordinate directions along which the element is aligned.
    *
-   * Since combinations are generated in falling order, coordinates usually are referenced in ascending order,
+   * Since combinations are generated in descending order, coordinates usually are referenced in ascending order,
    * the directions are actually not the value in the combination or its complement.
    * The index `i` returned by the combination is immediately replaced by `n-1-i`.
    */
@@ -61,7 +61,11 @@ public:
   constexpr Tint direction_index () const
   { return Combinations<n,k>::index(orientation); }
 
-  /// The coordinates in the `n`-dimensional chain complex
+  /**
+   * \brief The coordinates in the `n`-dimensional chain complex
+   *
+   * \param index between 0 and `n`, the direction in which the coordinate is returned.
+   */
   constexpr Sint operator[] (Tint index) const
   { return positions[index]; }
 
@@ -92,6 +96,14 @@ public:
   /**
    * \brief Function for printing the data stored in the element.
    *
+   * The format used is within enclosing parentheses as follows:
+   * <ol>
+   * <li> Each `along_direction` in order</li>
+   * <li> A colon</li>
+   * <li> Each `across_direction` in order </li>
+   * <li> A space</li>
+   * <li> Coordinates from 0 to `n-1` separated by commas</li>
+   * </ol>
    * \note This function is also used in the consistency tests,
    * therefore, the comparison data must be changed if the output
    * format is changed.
