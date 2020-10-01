@@ -38,7 +38,7 @@ class Slab
    aux_dimensions (const Lexicographic<n,k,Bint,Sint,Tint>& from,
                    const std::array<Tint,n-1>& directions)
    {
-     std::array<Sint,n-1> result;
+     std::array<Sint,n-1> result{};
      for (Tint i=0;i<n-1;++i)
        result[i] = from.fiber_dimension(directions[i]);
      return result;

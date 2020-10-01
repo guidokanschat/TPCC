@@ -17,7 +17,7 @@ void test(const TPCC::Slab<n,k,B,S,T>& slab)
 {
   std::cout << "    Slab-size: " << slab.size() << std::endl;
   unsigned int sum = 0;
-  for (unsigned int i=0;i<TPCC::binomial(n-1,k-1);++i)
+  for (unsigned int i=0;i<TPCC::binomial<unsigned int>(n-1,k-1);++i)
     {
       sum += slab.block_size(i);
       std::cout << "      Block-size " << i << ":\t" << slab.block_size(i) << std::endl;
@@ -40,7 +40,7 @@ void constexpr test(const A& arr)
   for (typename Mesh::dimension_index_t d=0;d<n;++d)
     {
       std::cout << "  Normal: " << (unsigned int) d << std::endl;
-      std::array<typename Mesh::dimension_index_t,n-1> directions;
+      std::array<typename Mesh::dimension_index_t,n-1> directions{};
       typename Mesh::dimension_index_t ii=0;
       for (typename Mesh::dimension_index_t i=0;i<directions.size();++i,++ii)
       {
@@ -54,7 +54,9 @@ void constexpr test(const A& arr)
           std::cout << ' ' << (int) directions[i];
         std::cout << std::endl;
         std::array<bool,n-1> all_false{};
-        std::array<bool,n-1> all_true{true};
+        std::array<bool,n-1> all_true{};
+	for (unsigned int i=0;i<n-1;++i)
+	  all_true[i] = true;
         TPCC::Slab<n,k> slab0{mesh, directions, all_false, d, 0};
         std::cout << "    Slab0 created" << std::endl;
         test(slab0);
