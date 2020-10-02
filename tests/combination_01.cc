@@ -1,3 +1,8 @@
+/**
+ * \file
+ * Combination::eliminate()
+ */
+
 #include <iostream>
 #include <iomanip>
 #include <sstream>
