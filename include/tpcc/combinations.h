@@ -17,7 +17,7 @@ template <typename T = unsigned int>
 constexpr T binomial(T n, T k)
 {
   if (n < k)
-    return 0;
+      return 0;
   T result = 1;
   if (k > n / 2)
     k = n - k;
