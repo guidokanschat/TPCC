@@ -2,63 +2,57 @@
 // Lexicographic::size()
 // Lexicographic::block_size()
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 #include <tpcc/lexicographic.h>
 
 // Reference output
-const unsigned int size2[] = { 12, 17, 6};
+const unsigned int size2[] = { 12, 17, 6 };
 const unsigned int size3[] = { 60, 133, 98, 24 };
 const unsigned int block_sizes20[] = { 12 };
 const unsigned int block_sizes21[] = { 9, 8 };
 const unsigned int block_sizes22[] = { 6 };
-const unsigned int *block_sizes2[] =
-{ block_sizes20, block_sizes21, block_sizes22 };
+const unsigned int* block_sizes2[] = { block_sizes20, block_sizes21, block_sizes22 };
 const unsigned int block_sizes30[] = { 60 };
-const unsigned int block_sizes31[] = { 48,45,40 };
-const unsigned int block_sizes32[] = { 36,32,30 };
+const unsigned int block_sizes31[] = { 48, 45, 40 };
+const unsigned int block_sizes32[] = { 36, 32, 30 };
 const unsigned int block_sizes33[] = { 24 };
-const unsigned int *block_sizes3[] =
-{ block_sizes30, block_sizes31, block_sizes32, block_sizes33 };
+const unsigned int* block_sizes3[] = { block_sizes30, block_sizes31, block_sizes32, block_sizes33 };
 
-constexpr std::array<unsigned short, 2> dim2 {{ 2,3 }};
-constexpr std::array<unsigned short, 3> dim3 {{ 2,3,4 }};
+constexpr std::array<unsigned short, 2> dim2{ { 2, 3 } };
+constexpr std::array<unsigned short, 3> dim3{ { 2, 3, 4 } };
 
 template <unsigned int k>
 void test_2()
 {
-  TPCC::Lexicographic<2,k> mesh = dim2;
-  std::cout << "Mesh-dim: " << 2
-            << " Element-dim: " << k
-            << "\n  Mesh-size: " << mesh.size()
+  TPCC::Lexicographic<2, k> mesh = dim2;
+  std::cout << "Mesh-dim: " << 2 << " Element-dim: " << k << "\n  Mesh-size: " << mesh.size()
             << std::endl;
   if (mesh.size() != size2[k])
     throw std::logic_error("Mesh sizes differ!");
-  for (unsigned int i=0;i<TPCC::binomial(2u,k);++i)
-    {
-      std::cout << "    Block-size " << i << ":\t" << mesh.block_size(i) << std::endl;
-      if (mesh.block_size(i) != block_sizes2[k][i])
-        throw std::logic_error("Block sizes differ!");
-    }
+  for (unsigned int i = 0; i < TPCC::binomial(2u, k); ++i)
+  {
+    std::cout << "    Block-size " << i << ":\t" << mesh.block_size(i) << std::endl;
+    if (mesh.block_size(i) != block_sizes2[k][i])
+      throw std::logic_error("Block sizes differ!");
+  }
 }
 
 template <unsigned int k>
 void test_3()
 {
-  TPCC::Lexicographic<3,k> mesh = dim3;
-  std::cout << "Mesh-dim: " << 3
-            << " Element-dim: " << k
-            << "\n  Mesh-size: " << mesh.size()
+  TPCC::Lexicographic<3, k> mesh = dim3;
+  std::cout << "Mesh-dim: " << 3 << " Element-dim: " << k << "\n  Mesh-size: " << mesh.size()
             << std::endl;
   if (mesh.size() != size3[k])
     throw std::logic_error("Mesh sizes differ!");
-  for (unsigned int i=0;i<TPCC::binomial(3u,k);++i)
-    {
-      std::cout << "    Block-size " << i << ":\t" << mesh.block_size(i) << std::endl;
-      if (mesh.block_size(i) != block_sizes3[k][i])
-        throw std::logic_error("Block sizes differ!");
-    }
+  for (unsigned int i = 0; i < TPCC::binomial(3u, k); ++i)
+  {
+    std::cout << "    Block-size " << i << ":\t" << mesh.block_size(i) << std::endl;
+    if (mesh.block_size(i) != block_sizes3[k][i])
+      throw std::logic_error("Block sizes differ!");
+  }
 }
 
 int main()

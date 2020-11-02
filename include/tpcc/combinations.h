@@ -2,8 +2,8 @@
 #define TPCC_COMBINATIONS_H
 
 #include <array>
-#include <ostream>
 #include <cassert>
+#include <ostream>
 
 namespace TPCC
 {
@@ -13,7 +13,7 @@ namespace TPCC
  * This function is constexpr, such that it can be eliminated
  * completely if #n and #k are known at compile time.
  */
-  template <typename T=unsigned int>
+template <typename T = unsigned int>
 constexpr T binomial(T n, T k)
 {
   if (n < k)
@@ -30,149 +30,144 @@ constexpr T binomial(T n, T k)
   return result;
 }
 
-  /**
-   * Given a combination as an array, compute its complement in the set of numbers
-   * from `0` to `n-1`.
-   *
-   * \todo Make this constexpr
-   */
-  template < typename T=unsigned int, T n, T k>
-  constexpr std::array<T,n-k>
-  compute_complement(std::array<T,k> combi)
+/**
+ * Given a combination as an array, compute its complement in the set of numbers
+ * from `0` to `n-1`.
+ *
+ * \todo Make this constexpr
+ */
+template <typename T = unsigned int, T n, T k>
+constexpr std::array<T, n - k> compute_complement(std::array<T, k> combi)
+{
+  std::array<unsigned int, n - k> result{};
+  unsigned int vpos = 0;
+  unsigned int current = n - 1;
+
+  for (unsigned int i = 0; i < n - k; ++i, --current)
   {
-    std::array<unsigned int, n - k> result{};
-      unsigned int vpos = 0;
-      unsigned int current = n-1;
-      
-      for (unsigned int i=0;i<n-k;++i,--current)
-	{
-	  while (vpos<k && current==combi[vpos])
-	    {
-	      --current;
-	      ++vpos;
-	    }
-	  result[i] = current;
-	}
-      return result;   
+    while (vpos < k && current == combi[vpos])
+    {
+      --current;
+      ++vpos;
+    }
+    result[i] = current;
   }
+  return result;
+}
 
 /**
  * \brief Dataset for a combination k out of n
  */
-  template <int n, int k, typename T=unsigned int>
+template <int n, int k, typename T = unsigned int>
 class Combination
 {
   /// The array of members
   std::array<T, k> data;
   /// The array of non-members
-  std::array<T,n-k> cdata;
+  std::array<T, n - k> cdata;
+
 public:
-  Combination(const std::array<T, k>& combi,
-	      const std::array<T,n-k>& comp)
-    : data(combi), cdata(comp)
-  {}
+  Combination(const std::array<T, k>& combi, const std::array<T, n - k>& comp)
+    : data(combi)
+    , cdata(comp)
+  {
+  }
   /**
    * \brief The `i`th element which is part of the combination in
    * descending order.
    */
-  T in(unsigned int i) const
-  {
-    return data[i];
-  }
+  T in(unsigned int i) const { return data[i]; }
   /**
    * \brief The `i`th element which is <b>not</b> part of the combination in
    * descending order.
    */
-  T out(unsigned int i) const
-  {
-    return cdata[i];
-  }
+  T out(unsigned int i) const { return cdata[i]; }
 
   /**
    * \brief Return the complement of this combination.
    */
-  Combination<n,n-k,T> complement() const
-  {
-    return Combination<n,n-k,T> (cdata, data);
-  }
-  
+  Combination<n, n - k, T> complement() const { return Combination<n, n - k, T>(cdata, data); }
+
   /**
    * \brief The combination obtained by eliminating the `i`th element
    *
-   * \note The return value type declaration with `std::enable_if` eliminates this function for `k==0`, since you cannot remove an item from an empty set.
+   * \note The return value type declaration with `std::enable_if` eliminates this function for
+   * `k==0`, since you cannot remove an item from an empty set.
    */
-  template <int kk=k>
-  constexpr typename std::enable_if<(kk>0),Combination<n,k-1,T> >::type
-  eliminate (unsigned int i) const
+  template <int kk = k>
+  constexpr typename std::enable_if<(kk > 0), Combination<n, k - 1, T>>::type eliminate(
+    unsigned int i) const
   {
-      std::array<T,k-1> outdata{};
-      for (unsigned int j=0;j<i;++j)
-          outdata[j] = data[j];
-      const T tmp = data[i];
-      for (unsigned int j=i;j<k-1;++j)
-        outdata[j] = data[j+1];
+    std::array<T, k - 1> outdata{};
+    for (unsigned int j = 0; j < i; ++j)
+      outdata[j] = data[j];
+    const T tmp = data[i];
+    for (unsigned int j = i; j < k - 1; ++j)
+      outdata[j] = data[j + 1];
 
-      std::array<T,n-k+1> outcdata{};
-      unsigned int jj=0,j=0;
-      for (;j<n-k;++j,++jj)
-          {
-            if (jj==j && cdata[j]<tmp)
-                {
-                    outcdata[j] = tmp;
-                    ++jj;
-                }
-            outcdata[jj] = cdata[j];
-          }
-      if (jj==j)
-          outcdata[n-k] = tmp;
-      return Combination<n,k-1>{outdata, outcdata};
+    std::array<T, n - k + 1> outcdata{};
+    unsigned int jj = 0, j = 0;
+    for (; j < n - k; ++j, ++jj)
+    {
+      if (jj == j && cdata[j] < tmp)
+      {
+        outcdata[j] = tmp;
+        ++jj;
+      }
+      outcdata[jj] = cdata[j];
+    }
+    if (jj == j)
+      outcdata[n - k] = tmp;
+    return Combination<n, k - 1>{ outdata, outcdata };
   }
   /**
    * \brief The combination obtained by adding the element `i`.
    *
-   * \note The return value type declaration with `std::enable_if` eliminates this function for `k==n`, since you cannot choose more than `n` items out of `n`.
+   * \note The return value type declaration with `std::enable_if` eliminates this function for
+   * `k==n`, since you cannot choose more than `n` items out of `n`.
    */
-  template <int kk=k>
-  constexpr typename std::enable_if<(kk<n),Combination<n,k+1,T> >::type
-  add (unsigned int i) const
+  template <int kk = k>
+  constexpr typename std::enable_if<(kk < n), Combination<n, k + 1, T>>::type add(
+    unsigned int i) const
   {
-      std::array<T,k+1> outdata{};
-      unsigned int jj=0,j=0;
-      for (;j<k;++j,++jj)
-          {
-            if (jj==j && data[j]<=i)
-                {
-                    assert(data[j]!=i);
-                    outdata[j] = i;
-                    ++jj;
-                }
-            outdata[jj] = data[j];
-          }
-      if (jj==j)
-          outdata[k] = i;
+    std::array<T, k + 1> outdata{};
+    unsigned int jj = 0, j = 0;
+    for (; j < k; ++j, ++jj)
+    {
+      if (jj == j && data[j] <= i)
+      {
+        assert(data[j] != i);
+        outdata[j] = i;
+        ++jj;
+      }
+      outdata[jj] = data[j];
+    }
+    if (jj == j)
+      outdata[k] = i;
 
-      std::array<T,n-k-1> outcdata{};
-      j=0;jj=0;
-      for (;j<n-k-1;++j,++jj)
-          {
-            if (cdata[j]==i)
-              ++jj;
-            outcdata[j] = cdata[jj];
-          }
-      return Combination<n,k+1>{outdata, outcdata};
+    std::array<T, n - k - 1> outcdata{};
+    j = 0;
+    jj = 0;
+    for (; j < n - k - 1; ++j, ++jj)
+    {
+      if (cdata[j] == i)
+        ++jj;
+      outcdata[j] = cdata[jj];
+    }
+    return Combination<n, k + 1>{ outdata, outcdata };
   }
 
   /**
-    * \brief The combination out of `n+1` obtained by adding one element
-    */
-  template <int kk=k>
-  constexpr typename std::enable_if<(kk<=n),Combination<n+1,k+1,T> >::type
-  add_and_expand (unsigned int i) const
+   * \brief The combination out of `n+1` obtained by adding one element
+   */
+  template <int kk = k>
+  constexpr typename std::enable_if<(kk <= n), Combination<n + 1, k + 1, T>>::type add_and_expand(
+    unsigned int i) const
   {
-    std::array<T,n+1-k> outcdata{};
+    std::array<T, n + 1 - k> outcdata{};
     std::copy(cdata.begin(), cdata.end(), outcdata.begin());
-    outcdata[n-k] = n;
-    return Combination<n+1,k>{data,outcdata}.add(i);
+    outcdata[n - k] = n;
+    return Combination<n + 1, k>{ data, outcdata }.add(i);
   }
 
   /**
@@ -180,17 +175,14 @@ public:
    */
   void print_debug(std::ostream& os) const
   {
-    for (unsigned int i=0;i<k;++i)
+    for (unsigned int i = 0; i < k; ++i)
       os << in(i);
     os << ':';
-    for (unsigned int i=0;i<n-k;++i)
+    for (unsigned int i = 0; i < n - k; ++i)
       os << out(i);
   }
-  
-  };
+};
 
-
-  
 /**
  * The combinations of `k` elements out of `n` as a container.
  *
@@ -210,8 +202,8 @@ struct Combinations
   /**
    * \brief A boolean array of length `n` with a `true` for each selected value
    */
-  constexpr Combination<n,k> operator[] (unsigned int);
-  
+  constexpr Combination<n, k> operator[](unsigned int);
+
   /**
    * \brief The array of numbers (of length `k`) in the combination
    * with given index.
@@ -231,18 +223,18 @@ struct Combinations
    * \brief The index of a combination within the lexicographic enumeration
    */
   template <typename T>
-  static constexpr unsigned int index(const Combination<n,k,T>& combi);
+  static constexpr unsigned int index(const Combination<n, k, T>& combi);
 
-  private:
+private:
   /**
    * \brief The function template computing the combination in
    * lexicographic ordering recursively.
    */
   template <unsigned int size, typename... I>
-  static constexpr std::array<unsigned int,k> compute_value(unsigned int index, I ...args);
+  static constexpr std::array<unsigned int, k> compute_value(unsigned int index, I... args);
 };
 
-  //----------------------------------------------------------------------//
+//----------------------------------------------------------------------//
 
 template <int n, int k>
 constexpr unsigned int Combinations<n, k>::size()
@@ -252,50 +244,48 @@ constexpr unsigned int Combinations<n, k>::size()
 
 template <int n, int k>
 template <unsigned int sz, typename... I>
-constexpr std::array<unsigned int,k>
-Combinations<n, k>::compute_value(unsigned int index, I ...args)
+constexpr std::array<unsigned int, k> Combinations<n, k>::compute_value(unsigned int index,
+                                                                        I... args)
 {
   if (index > size())
     abort();
-  if constexpr (sz==1)
-    return std::array<unsigned int,k>{args..., index};
+  if constexpr (sz == 1)
+    return std::array<unsigned int, k>{ args..., index };
   else
   {
-    unsigned int cs = sz-1;
+    unsigned int cs = sz - 1;
     unsigned int bn = 0;
     for (; cs <= n; ++cs)
-      {
-        unsigned int bi = binomial(cs,sz);
-        if (bi>index)
-            break;
-        bn = bi;
-      }
+    {
+      unsigned int bi = binomial(cs, sz);
+      if (bi > index)
+        break;
+      bn = bi;
+    }
     --cs;
-    return compute_value<sz-1>(index-bn, args..., cs);
+    return compute_value<sz - 1>(index - bn, args..., cs);
   }
 }
 
-
 template <int n, int k>
 template <typename T>
-inline constexpr unsigned int Combinations<n, k>::index(const Combination<n,k,T>& combi)
+inline constexpr unsigned int Combinations<n, k>::index(const Combination<n, k, T>& combi)
 {
   unsigned int result = 0;
-  for (unsigned int i=0;i<k;++i)
-    result += binomial(combi.in(i),k-i);
+  for (unsigned int i = 0; i < k; ++i)
+    result += binomial(combi.in(i), k - i);
   return result;
 }
 
 //----------------------------------------------------------------------//
 
-
 template <int n, int k>
 std::array<unsigned int, k> Combinations<n, k>::value(unsigned int index)
 {
-  if constexpr (k==0)
+  if constexpr (k == 0)
   {
-      ++index; // Avoid warning about unused variable
-      return std::array<unsigned int,0>();
+    ++index; // Avoid warning about unused variable
+    return std::array<unsigned int, 0>();
   }
   else
     return compute_value<k>(index);
@@ -304,17 +294,17 @@ std::array<unsigned int, k> Combinations<n, k>::value(unsigned int index)
 template <int n, int k>
 std::array<unsigned int, n - k> Combinations<n, k>::dual(unsigned int index)
 {
-  if constexpr (k==0)
-    return Combinations<n,n>::value(index);
+  if constexpr (k == 0)
+    return Combinations<n, n>::value(index);
   auto v = value(index);
-  return compute_complement<unsigned int,n,k>(v);
+  return compute_complement<unsigned int, n, k>(v);
 }
 
 template <int n, int k>
-constexpr Combination<n,k> Combinations<n, k>::operator[] (unsigned int index)
+constexpr Combination<n, k> Combinations<n, k>::operator[](unsigned int index)
 {
-  return Combination<n,k>(value(index), dual(index));
+  return Combination<n, k>(value(index), dual(index));
 }
-}
+} // namespace TPCC
 
 #endif
