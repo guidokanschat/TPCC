@@ -272,7 +272,7 @@ template <typename T>
 inline constexpr unsigned int Combinations<n, k>::index(const Combination<n, k, T>& combi)
 {
   unsigned int result = 0;
-  if constexpr (k>0)
+  if constexpr (k > 0)
     for (unsigned int i = 0; i < k; ++i)
       result += binomial(combi.in(i), k - i);
   return result;
