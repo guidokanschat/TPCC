@@ -131,7 +131,7 @@ public:
     unsigned int i) const
   {
     std::array<T, k + 1> outdata{};
-    unsigned int jj = 0, j = 0;
+    int jj = 0, j = 0;
     for (; j < k; ++j, ++jj)
     {
       if (jj == j && data[j] <= i)
@@ -175,10 +175,10 @@ public:
    */
   void print_debug(std::ostream& os) const
   {
-    for (unsigned int i = 0; i < k; ++i)
+    for (int i = 0; i < k; ++i)
       os << in(i);
     os << ':';
-    for (unsigned int i = 0; i < n - k; ++i)
+    for (int i = 0; i < n - k; ++i)
       os << out(i);
   }
 };

@@ -63,7 +63,7 @@ struct print_combination
       auto b = combinations.dual(i);
       auto combi = combinations[i];
       std::array<bool, n> boolvalue;
-      for (unsigned int j = 0; j < k; ++j)
+      for (int j = 0; j < k; ++j)
       {
         if (a[j] != combi.in(j))
           throw std::logic_error{ "value() and operator[] inconsistent" };
@@ -71,7 +71,7 @@ struct print_combination
           throw std::logic_error{ "Combination does not match stored data" };
         boolvalue[a[j]] = true;
       }
-      for (unsigned int j = 0; j < n - k; ++j)
+      for (int j = 0; j < n - k; ++j)
       {
         if (b[j] != combi.out(j))
           throw std::logic_error{ "dual() and operator[] inconsistent" };

@@ -135,13 +135,13 @@ Element<n, k, Sint, Tint> Lexicographic<n, k, Bint, Sint, Tint>::operator[](Bint
   auto combination = combinations[b];
 
   std::array<Sint, n> coordinates;
-  for (unsigned int i = 0; i < k; ++i)
+  for (int i = 0; i < k; ++i)
   {
     Sint fdim = dimensions[n - 1 - combination.in(i)];
     coordinates[n - 1 - combination.in(i)] = index % fdim;
     index /= fdim;
   }
-  for (unsigned int i = 0; i < n - k; ++i)
+  for (int i = 0; i < n - k; ++i)
   {
     Sint fdim = 1 + dimensions[n - 1 - combination.out(i)];
     coordinates[n - 1 - combination.out(i)] = index % fdim;
