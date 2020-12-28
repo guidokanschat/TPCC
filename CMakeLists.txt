@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -Wall -pedantic -Wextra -D_GLIBCXX
 include_directories(include)
 
 add_subdirectory(tests)
+add_subdirectory(benchmarks)
 add_subdirectory(doc)
 
 # add_executable(TensorEnumeration main.cpp)
