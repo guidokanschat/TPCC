@@ -1,6 +1,9 @@
 # TPCC
 #### Enumeration of tensor product chain complexes
 
+## Quick links
+##### [Setup](https://github.com/guidokanschat/TPCC/wiki/Setup)
+
 ## Overview
 
 This little library enumerates the objects in a tensor product chain complex, that is for instance, the k-dimensional facets in an n-dimensional Cartesian mesh.
