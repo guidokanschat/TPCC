@@ -10,8 +10,9 @@ IF(BUILD_DOCUMENTATION)
   ENDIF()
 
   # Input files for doxygen
-  SET(DOXYGEN_INPUT ${PROJECT_SOURCE_DIR}/include)
+  SET(DOXYGEN_INPUT ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/doc/include)
   SET(DOXYGEN_STRIP_FROM_PATH ${PROJECT_SOURCE_DIR}/include)
+  SET(DOXYGEN_IMAGE_PATH ${PROJECT_SOURCE_DIR}/doc/img)
 
   # Generate doxyfile and put it into build directory
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in

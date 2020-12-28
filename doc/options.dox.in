@@ -24,6 +24,7 @@ EXTRA_PACKAGES	       = amsmath
 
 INPUT                  = @DOXYGEN_INPUT@
 EXAMPLE_PATH           = @DOXYGEN_INPUT@
+IMAGE_PATH	       = @DOXYGEN_IMAGE_PATH@
 RECURSIVE	       = YES
 
 UML_LOOK	       = YES
