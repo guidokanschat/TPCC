@@ -67,7 +67,7 @@ class Combination
   std::array<T, n - k> cdata;
 
 public:
-  Combination(const std::array<T, k>& combi, const std::array<T, n - k>& comp)
+  constexpr Combination(const std::array<T, k>& combi, const std::array<T, n - k>& comp)
     : data(combi)
     , cdata(comp)
   {
@@ -76,12 +76,12 @@ public:
    * \brief The `i`th element which is part of the combination in
    * descending order.
    */
-  T in(unsigned int i) const { return data[i]; }
+  constexpr T in(unsigned int i) const { return data[i]; }
   /**
    * \brief The `i`th element which is <b>not</b> part of the combination in
    * descending order.
    */
-  T out(unsigned int i) const { return cdata[i]; }
+  constexpr T out(unsigned int i) const { return cdata[i]; }
 
   /**
    * \brief Return the complement of this combination.
@@ -202,13 +202,13 @@ struct Combinations
   /**
    * \brief A boolean array of length `n` with a `true` for each selected value
    */
-  constexpr Combination<n, k> operator[](unsigned int);
+  constexpr Combination<n, k> operator[](unsigned int) const;
 
   /**
    * \brief The array of numbers (of length `k`) in the combination
    * with given index.
    */
-  static std::array<unsigned int, k> value(unsigned int index);
+  static constexpr std::array<unsigned int, k> value(unsigned int index);
   /**
    * \brief The array of numbers (of length `n-k`) of numbers not in
    * the combination of the given index.
@@ -217,7 +217,7 @@ struct Combinations
    * building the complement. It it is to be used often, the
    * implementation should be more efficient.
    */
-  static std::array<unsigned int, n - k> dual(unsigned int index);
+  static constexpr std::array<unsigned int, n - k> dual(unsigned int index);
 
   /**
    * \brief The index of a combination within the lexicographic enumeration
@@ -281,6 +281,7 @@ inline constexpr unsigned int Combinations<n, k>::index(const Combination<n, k, 
 //----------------------------------------------------------------------//
 
 template <int n, int k>
+constexpr
 std::array<unsigned int, k> Combinations<n, k>::value(unsigned int index)
 {
   if constexpr (k == 0)
@@ -293,6 +294,7 @@ std::array<unsigned int, k> Combinations<n, k>::value(unsigned int index)
 }
 
 template <int n, int k>
+constexpr
 std::array<unsigned int, n - k> Combinations<n, k>::dual(unsigned int index)
 {
   if constexpr (k == 0)
@@ -302,7 +304,7 @@ std::array<unsigned int, n - k> Combinations<n, k>::dual(unsigned int index)
 }
 
 template <int n, int k>
-constexpr Combination<n, k> Combinations<n, k>::operator[](unsigned int index)
+constexpr Combination<n, k> Combinations<n, k>::operator[](unsigned int index) const
 {
   return Combination<n, k>(value(index), dual(index));
 }

@@ -66,7 +66,7 @@ public:
    * \brief Constructor setting the dimensions of the complex.
    */
   constexpr Lexicographic(const std::array<Sint, n>& d)
-    : dimensions(d)
+    : dimensions{d}, block_sizes{}
   {
     Combinations<n, k> combinations;
     for (Tint i = 0; i < binomial(n, k); ++i)
